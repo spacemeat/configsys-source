@@ -1,0 +1,81 @@
+{
+    // ADDITIVE `via: source` bindings — each ADDS a build-from-source method to an existing core
+    // component. `source` is second-to-last in driver-preference, so it NEVER wins a default;
+    // select it with `configsys pin set <comp> source` (or a gentoo-ish `driver-preference:`).
+    //
+    // Recipe convention: clone `repo` at the tag formed from the discovered `version` +
+    // `tag-prefix` (bare-versioned repos: no strip-v, empty prefix; `vX.Y.Z` repos: strip-v +
+    // tag-prefix "v"), then `build:` produces the binary and installs it into $PREFIX/bin (so it
+    // lands on PATH at ~/.local/bin, no alias). $PREFIX/$SRC/$VERSION/$ARCH are substituted.
+    //
+    // Verified subset (container-built) is noted per recipe; the rest are transcribed from each
+    // project's own build docs.
+    components: {
+
+        // ----- Rust / cargo (needs `cargo` = the rust toolchain) --------------------------------
+        // NOTE: `cargo` = the DISTRO rust (rust-all/cargo), which can be older than a project's
+        // MSRV — Ubuntu 24.04 ships Rust 1.75, but ripgrep needs 1.96, so the build fails there
+        // with a manifest/edition error. Build on a distro with recent Rust (Arch's 1.97 builds it
+        // cleanly — verified), or supply a newer toolchain. Same toolchain-floor caveat as Go below.
+        // ripgrep: bare-semver release tags; default build needs only cargo (PCRE2 is opt-in).
+        // [VERIFIED: built ripgrep 15.2.0 on archlinux (rustc 1.97.1).]
+        // (fd, bat — also clean `cargo build` recipes — are DEFERRED: they aren't in core yet, and
+        // this plugin only ADDS `source` to components that already have a binary method, so
+        // shipping them here would make them build-by-default. Add fd/bat to core routes.hu first
+        // [fd: apt fd-find/dnf fd-find/pacman fd; bat: note Debian's `batcat` binary rename], then a
+        // later batch adds their source alternative.)
+        ripgrep: {
+            install: [
+                { via: source  repo: "https://github.com/BurntSushi/ripgrep"
+                  version: { github: BurntSushi/ripgrep }  requires: cargo
+                  build: "cargo build --release && install -Dm755 target/release/rg $PREFIX/bin/rg" }
+            ]
+        }
+
+        // ----- Go (needs `go`) ------------------------------------------------------------------
+        // NOTE: `go` installs the DISTRO Go (golang-go/golang), which can be older than these
+        // projects' go.mod floor — lazygit needs Go >= 1.25, superfile >= 1.26. On a distro whose
+        // packaged Go is older the build fails clearly; use a distro with a recent Go (Arch, or a
+        // current Fedora), or a newer Go toolchain. Static builds (CGO_ENABLED=0), main pkg at root.
+        // [VERIFIED: built lazygit on archlinux (recent Go).]
+        lazygit: {
+            install: [
+                { via: source  repo: "https://github.com/jesseduffield/lazygit"
+                  version: { github: jesseduffield/lazygit  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o lazygit . && install -Dm755 lazygit $PREFIX/bin/lazygit" }
+            ]
+        }
+        superfile: {
+            install: [
+                { via: source  repo: "https://github.com/yorukot/superfile"
+                  version: { github: yorukot/superfile  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o spf . && install -Dm755 spf $PREFIX/bin/spf" }
+            ]
+        }
+
+        // ----- C / autotools (git checkout -> autogen -> configure -> make) ---------------------
+        // htop: only hard dev-lib dep is ncurses (wide); sensors/capabilities/delayacct auto-skip
+        // if their headers are absent. `make uninstall` cleans the prefix. Bare-version tags.
+        // [VERIFIED: built htop on fedora:41 (ncurses-devel + pkgconf-pkg-config name maps).]
+        htop: {
+            install: [
+                { via: source  repo: "https://github.com/htop-dev/htop"
+                  version: { github: htop-dev/htop }
+                  requires: [ cc, make, autoconf, automake, pkg-config, ncurses ]
+                  build: "./autogen.sh && ./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // tmux: needs libevent + ncurses, and a yacc (bison) for its grammar. `sh autogen.sh`
+        // (not ./autogen.sh) per upstream. Bare-version tags (e.g. 3.7, 3.7a).
+        tmux: {
+            install: [
+                { via: source  repo: "https://github.com/tmux/tmux"
+                  version: { github: tmux/tmux }
+                  requires: [ cc, make, autoconf, automake, pkg-config, bison, ncurses, libevent ]
+                  build: "sh autogen.sh && ./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+    }
+}

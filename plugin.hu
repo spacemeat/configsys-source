@@ -1,0 +1,23 @@
+{
+    // configsys-source — add a selectable BUILD-FROM-SOURCE (`via: source`) method to (most)
+    // genuinely-buildable components. Data-only: it ships NO code (the built-in `source` driver
+    // does the work), so there's no trust step — add it and every covered component gains a
+    // `source` binding you can pin.
+    //
+    // The bindings are ADDITIVE and always LOWER preference than any binary method (native/
+    // flatpak/appImage/tarball all outrank `source` in driver-preference), so loading this plugin
+    // NEVER changes a default resolution — source is strictly opt-in. Pick it per component with
+    //   configsys pin set <component> source
+    // or globally reorder with a `driver-preference:` that puts `source` first (the "gentoo-ish"
+    // posture). Two motivations: (1) build anything from source anywhere (contributors), and
+    // (2) install a tool on an OS that has no binary method for it.
+    //
+    // Genuinely gnarly builds (GPU SDKs, GTK desktops, huge Rust workspaces) are NOT here — they
+    // each get their own bespoke plugin, like configsys-blender / configsys-kicad. See the README.
+    name: configsys-source
+    requires-abi: 1
+
+    // Two data layers: the shared build-tool + dev-library components, then the per-component
+    // source recipes.
+    data: [ tools.hu, sources.hu ]
+}

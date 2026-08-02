@@ -1,0 +1,23 @@
+{
+    // Shared BUILD-TIME tools + dev-library capabilities the source recipes (sources.hu) pull via
+    // `requires:`. These are not things you build from source — they're the toolchain — so they
+    // install `via: native`, with per-distro name maps where the package name differs. Names
+    // verified against current apt/dnf/pacman/apk/zypper repos (keep them honest with a name sweep
+    // as repos roll). Core already provides cc/cxx (gcc/clang), cargo (rust), and make/cmake/
+    // ninja/meson/go/zig; this file fills the autotools + dev-lib gaps.
+    components: {
+
+        // --- build tools (component name is the apt/zypper name; override the others) ---
+        // pkg-config: Fedora ships the shim as pkgconf-pkg-config; Arch/Alpine call it pkgconf.
+        pkg-config: { install: [ { via: native  name: { dnf: pkgconf-pkg-config  pacman: pkgconf  apk: pkgconf } } ] }
+        autoconf:   { install: [ { via: native } ] }   // same name on every manager
+        automake:   { install: [ { via: native } ] }
+        libtool:    { install: [ { via: native } ] }
+        bison:      { install: [ { via: native } ] }   // the yacc a few grammars (tmux) need
+
+        // --- dev libraries (headers + libs). Debian/Fedora/openSUSE split a -dev/-devel package;
+        // Arch (and the component-name default) don't split, so the base name carries headers. ---
+        ncurses:  { install: [ { via: native  name: { apt: libncurses-dev  dnf: ncurses-devel   apk: ncurses-dev   zypper: ncurses-devel } } ] }
+        libevent: { install: [ { via: native  name: { apt: libevent-dev    dnf: libevent-devel  apk: libevent-dev  zypper: libevent-devel } } ] }
+    }
+}
