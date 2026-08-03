@@ -26,5 +26,11 @@
         libcurl:  { install: [ { via: native  name: { apt: libcurl4-openssl-dev  dnf: libcurl-devel  pacman: curl  apk: curl-dev  zypper: libcurl-devel } } ] }
         expat:    { install: [ { via: native  name: { apt: libexpat1-dev   dnf: expat-devel     pacman: expat  apk: expat-dev    zypper: libexpat-devel } } ] }
         gettext:  { install: [ { via: native  name: { apk: gettext-dev     zypper: gettext-tools } } ] }   // msgfmt/libintl for i18n
+        libpcap:  { install: [ { via: native  name: { apt: libpcap-dev     dnf: libpcap-devel   apk: libpcap-dev  zypper: libpcap-devel } } ] }   // packet capture (nethogs)
+        sqlite:   { install: [ { via: native  name: { apt: libsqlite3-dev  dnf: sqlite-devel    pacman: sqlite  apk: sqlite-dev  zypper: sqlite3-devel } } ] }
+        libmtp:   { install: [ { via: native  name: { apt: libmtp-dev      dnf: libmtp-devel    apk: libmtp-dev   zypper: libmtp-devel } } ] }        // MTP (jmtpfs)
+        fuse:     { install: [ { via: native  name: { apt: libfuse-dev     dnf: fuse-devel      pacman: fuse2   apk: fuse-dev    zypper: fuse-devel } } ] }        // FUSE 2 (jmtpfs)
+        libusb:   { install: [ { via: native  name: { apt: libusb-1.0-0-dev  dnf: libusb1-devel  pacman: libusb  apk: libusb-dev  zypper: libusb-1_0-devel } } ] }
+        libmagic: { install: [ { via: native  name: { apt: libmagic-dev    dnf: file-devel      pacman: file    apk: file-dev    zypper: file-devel } } ] }        // libmagic/file-type (jmtpfs)
     }
 }

@@ -39,6 +39,11 @@ rows=(
 'mtr|fedora:41|dnf install -y -q gcc make autoconf automake pkgconf-pkg-config ncurses-devel git|./bootstrap.sh && ./configure --prefix=/root/.local --sbindir=/root/.local/bin --without-gtk && make && make install && /root/.local/bin/mtr --version'
 'curl|fedora:41|dnf install -y -q gcc make autoconf automake libtool pkgconf-pkg-config openssl-devel zlib-devel git|autoreconf -fi && ./configure --prefix=/root/.local --with-openssl --with-zlib --without-libpsl && make && make install && /root/.local/bin/curl --version'
 'helm|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -trimpath -o helm ./cmd/helm && install -Dm755 helm /root/.local/bin/helm && /root/.local/bin/helm version'
+'neovim|fedora:41|dnf install -y -q gcc gcc-c++ make cmake ninja-build gettext curl unzip git|make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=/root/.local && make install && /root/.local/bin/nvim --version'
+'nethogs|fedora:41|dnf install -y -q gcc gcc-c++ make libpcap-devel ncurses-devel git|make && install -Dm755 src/nethogs /root/.local/bin/nethogs && test -x /root/.local/bin/nethogs && echo nethogs-built'
+'jmtpfs|fedora:41|dnf install -y -q gcc-c++ make pkgconf-pkg-config libmtp-devel fuse-devel libusb1-devel file-devel git|./configure --prefix=/root/.local && make && make install && test -x /root/.local/bin/jmtpfs && echo jmtpfs-built'
+'iperf3|fedora:41|dnf install -y -q gcc make git|./configure --prefix=/root/.local && make && make install && /root/.local/bin/iperf3 --version'
+'vnstat|fedora:41|dnf install -y -q gcc make sqlite-devel git|./configure --prefix=/root/.local && make && make install && /root/.local/bin/vnstat --version'
 # NOTE: git and nmap are source-buildable and verified out-of-band, but are NOT gated here.
 # Both trip a rootless-podman user-namespace quirk where `tar` cannot chmod certain archived
 # dirs as container-root (git's install-time template tree; nmap's bundled `zenmap` dir on
@@ -58,6 +63,9 @@ declare -A repo=(
   [grpcurl]=https://github.com/fullstorydev/grpcurl [nushell]=https://github.com/nushell/nushell
   [yazi]=https://github.com/sxyazi/yazi [mtr]=https://github.com/traviscross/mtr
   [curl]=https://github.com/curl/curl [helm]=https://github.com/helm/helm
+  [neovim]=https://github.com/neovim/neovim [nethogs]=https://github.com/raboof/nethogs
+  [jmtpfs]=https://github.com/JasonFerrara/jmtpfs [iperf3]=https://github.com/esnet/iperf
+  [vnstat]=https://github.com/vergoh/vnstat
 )
 
 fail=0

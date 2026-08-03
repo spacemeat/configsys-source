@@ -168,6 +168,30 @@
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX && cmake --build build && cmake --install build" }
             ]
         }
+        // neovim: bundles its own deps (libuv/luajit/tree-sitter/...) — the top-level Makefile builds
+        // them first, so it needs only a C/C++ toolchain + cmake/ninja + gettext (libintl) and
+        // curl/unzip (to fetch the bundled dep sources). Adds a `source` method beside core's appImage.
+        // vX.Y.Z tags. [VERIFIED: built NVIM v0.12.4 on fedora:41.]
+        neovim: {
+            install: [
+                { via: source  repo: "https://github.com/neovim/neovim"
+                  version: { github: neovim/neovim  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, cxx, cmake, ninja, make, gettext, curl, unzip ]
+                  build: "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$PREFIX && make install" }
+            ]
+        }
+        // nethogs: C++ Makefile; needs libpcap (packet capture) + ncurses. Its `make install` drops the
+        // binary in $PREFIX/sbin, so install the built `src/nethogs` into $PREFIX/bin ourselves (on
+        // PATH). Runs as root (raw sockets) but builds unprivileged. vX.Y.Z tags.
+        // [VERIFIED: built on fedora:41 (libpcap-devel + ncurses-devel).]
+        nethogs: {
+            install: [
+                { via: source  repo: "https://github.com/raboof/nethogs"
+                  version: { github: raboof/nethogs  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, cxx, make, ncurses, libpcap ]
+                  build: "make && install -Dm755 src/nethogs $PREFIX/bin/nethogs" }
+            ]
+        }
 
         // ----- C / autotools (git checkout -> autogen -> configure -> make) ---------------------
         // htop: only hard dev-lib dep is ncurses (wide); sensors/capabilities/delayacct auto-skip
@@ -254,6 +278,42 @@
                 { via: source  version: { static: 7.99 }
                   url: "https://nmap.org/dist/nmap-$VERSION.tar.bz2"
                   requires: [ cxx, cc, make ]
+                  build: "./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // iperf3: ships a committed ./configure (no autoreconf); bundles cJSON, so a C toolchain is
+        // all it needs. Release tags are BARE (e.g. 3.21) -> the discovered tag is the ref, no
+        // strip-v/prefix. [VERIFIED: built iperf 3.21 on fedora:41.]
+        iperf3: {
+            install: [
+                { via: source  repo: "https://github.com/esnet/iperf"
+                  version: { github: esnet/iperf }
+                  requires: [ cc, make ]
+                  build: "./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // vnstat: ships a committed ./configure; needs sqlite (its stats DB). vX.Y tags.
+        // [VERIFIED: built vnStat 2.14 on fedora:41 (sqlite-devel).]
+        vnstat: {
+            install: [
+                { via: source  repo: "https://github.com/vergoh/vnstat"
+                  version: { github: vergoh/vnstat  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, make, sqlite ]
+                  build: "./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // jmtpfs: MTP/Android FUSE mount. Ships a committed ./configure (its OWN generated autotools,
+        // NOT an autogen.sh). Needs libmtp + fuse2 + libusb + libmagic. Upstream is frozen at v0.5
+        // (2016) and publishes NO github Releases, so pin the version statically (ref = tag-prefix +
+        // version = v0.5). [VERIFIED: built on fedora:41.]
+        jmtpfs: {
+            install: [
+                { via: source  version: { static: "0.5" }  tag-prefix: "v"
+                  repo: "https://github.com/JasonFerrara/jmtpfs"
+                  requires: [ cxx, make, pkg-config, libmtp, fuse, libusb, libmagic ]
                   build: "./configure --prefix=$PREFIX && make && make install"
                   uninstall-cmd: "make uninstall" }
             ]
