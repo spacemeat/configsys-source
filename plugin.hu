@@ -17,7 +17,8 @@
     name: configsys-source
     requires-abi: 1
 
-    // Two data layers: the shared build-tool + dev-library components, then the per-component
-    // source recipes.
-    data: [ tools.hu, sources.hu ]
+    // Data layers: shared build-tool + dev-library components, the per-component source recipes,
+    // then the auto-derived toolchain floors (version-floors:) that tighten each recipe's cargo/go
+    // requirement so configsys can advise/select a toolchain that meets it.
+    data: [ tools.hu, sources.hu, floors.hu ]
 }
