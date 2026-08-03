@@ -17,8 +17,14 @@
     name: configsys-source
     requires-abi: 1
 
-    // Data layers: shared build-tool + dev-library components, the per-component source recipes,
-    // then the auto-derived toolchain floors (version-floors:) that tighten each recipe's cargo/go
-    // requirement so configsys can advise/select a toolchain that meets it.
-    data: [ tools.hu, sources.hu, floors.hu ]
+    // Data layers: shared build-tool + dev-library components, and the per-component source recipes.
+    data: [ tools.hu, sources.hu ]
+
+    // Pull in the auto-derived version floors (configsys-versions) so each recipe's toolchain
+    // minimum (Rust MSRV, go.mod) stays current WITHOUT re-releasing these recipes: THIS plugin
+    // can be pinned to a stable tag while floors keep flowing on `main`. Transitive, so source-build
+    // users get fresh floors for free; it stays a visible, declared layer (`configsys plugin list`).
+    plugins: [
+        { source: "github:spacemeat/configsys-versions"  ref: main }
+    ]
 }
