@@ -192,6 +192,37 @@
                   build: "make && install -Dm755 src/nethogs $PREFIX/bin/nethogs" }
             ]
         }
+        // ninja: tiny C++ build tool — cmake build (bootstraps itself). vX.Y.Z tags.
+        // [VERIFIED: built ninja 1.14 on fedora:41.]
+        ninja: {
+            install: [
+                { via: source  repo: "https://github.com/ninja-build/ninja"
+                  version: { github: ninja-build/ninja  strip-v: true }  tag-prefix: "v"
+                  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build && cmake --install build" }
+            ]
+        }
+        // protobuf (protoc): cmake build; vendors abseil as a git submodule (`--init` first,
+        // ABSL_PROVIDER=module), tests off. vX.Y.Z tags. [VERIFIED: built libprotoc on fedora:41.]
+        protobuf: {
+            install: [
+                { via: source  repo: "https://github.com/protocolbuffers/protobuf"
+                  version: { github: protocolbuffers/protobuf  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, cxx, cmake, make ]
+                  build: "git submodule update --init --recursive && cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module && cmake --build build && cmake --install build" }
+            ]
+        }
+        // whois: Marco d'Itri's whois (the `whois` on Debian). Plain Makefile; needs libidn2 (IDN) +
+        // perl (generates its TLD-server table) + gettext (msgfmt). Publishes NO github Releases (git
+        // tags only), so pin statically (ref = v + version). [VERIFIED: built on fedora:41.]
+        whois: {
+            install: [
+                { via: source  version: { static: "5.6.6" }  tag-prefix: "v"
+                  repo: "https://github.com/rfc1036/whois"
+                  requires: [ cc, make, perl, libidn2, gettext ]
+                  build: "make && make install prefix=$PREFIX" }
+            ]
+        }
 
         // ----- C / autotools (git checkout -> autogen -> configure -> make) ---------------------
         // htop: only hard dev-lib dep is ncurses (wide); sensors/capabilities/delayacct auto-skip

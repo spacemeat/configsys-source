@@ -32,5 +32,6 @@
         fuse:     { install: [ { via: native  name: { apt: libfuse-dev     dnf: fuse-devel      pacman: fuse2   apk: fuse-dev    zypper: fuse-devel } } ] }        // FUSE 2 (jmtpfs)
         libusb:   { install: [ { via: native  name: { apt: libusb-1.0-0-dev  dnf: libusb1-devel  pacman: libusb  apk: libusb-dev  zypper: libusb-1_0-devel } } ] }
         libmagic: { install: [ { via: native  name: { apt: libmagic-dev    dnf: file-devel      pacman: file    apk: file-dev    zypper: file-devel } } ] }        // libmagic/file-type (jmtpfs)
+        libidn2:  { install: [ { via: native  name: { apt: libidn2-dev     dnf: libidn2-devel   apk: libidn2-dev  zypper: libidn2-devel } } ] }        // IDN (whois)
     }
 }

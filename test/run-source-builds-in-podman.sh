@@ -44,6 +44,9 @@ rows=(
 'jmtpfs|fedora:41|dnf install -y -q gcc-c++ make pkgconf-pkg-config libmtp-devel fuse-devel libusb1-devel file-devel git|./configure --prefix=/root/.local && make && make install && test -x /root/.local/bin/jmtpfs && echo jmtpfs-built'
 'iperf3|fedora:41|dnf install -y -q gcc make git|./configure --prefix=/root/.local && make && make install && /root/.local/bin/iperf3 --version'
 'vnstat|fedora:41|dnf install -y -q gcc make sqlite-devel git|./configure --prefix=/root/.local && make && make install && /root/.local/bin/vnstat --version'
+'ninja|fedora:41|dnf install -y -q gcc-c++ cmake make git|cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local -DCMAKE_BUILD_TYPE=Release && cmake --build build && cmake --install build && /root/.local/bin/ninja --version'
+'protobuf|fedora:41|dnf install -y -q gcc-c++ cmake make git|git submodule update --init --recursive && cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module && cmake --build build && cmake --install build && /root/.local/bin/protoc --version'
+'whois|fedora:41|dnf install -y -q gcc make perl libidn2-devel gettext git|make && make install prefix=/root/.local && test -x /root/.local/bin/whois && echo whois-built'
 # NOTE: git and nmap are source-buildable and verified out-of-band, but are NOT gated here.
 # Both trip a rootless-podman user-namespace quirk where `tar` cannot chmod certain archived
 # dirs as container-root (git's install-time template tree; nmap's bundled `zenmap` dir on
@@ -66,6 +69,8 @@ declare -A repo=(
   [neovim]=https://github.com/neovim/neovim [nethogs]=https://github.com/raboof/nethogs
   [jmtpfs]=https://github.com/JasonFerrara/jmtpfs [iperf3]=https://github.com/esnet/iperf
   [vnstat]=https://github.com/vergoh/vnstat
+  [ninja]=https://github.com/ninja-build/ninja [protobuf]=https://github.com/protocolbuffers/protobuf
+  [whois]=https://github.com/rfc1036/whois
 )
 
 fail=0
