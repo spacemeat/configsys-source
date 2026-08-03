@@ -52,6 +52,32 @@
                   build: "CGO_ENABLED=0 go build -o spf . && install -Dm755 spf $PREFIX/bin/spf" }
             ]
         }
+        // fzf: a plain Go build straight into the prefix (folded from core). Bare-version tags.
+        fzf: {
+            install: [
+                { via: source  repo: "https://github.com/junegunn/fzf"
+                  version: { github: junegunn/fzf }  requires: go
+                  build: "mkdir -p $PREFIX/bin && go build -o $PREFIX/bin/fzf" }
+            ]
+        }
+
+        // ----- C / C++ (make + cmake) -----------------------------------------------------------
+        // btop: C++ Makefile, installs under the prefix. Folded from core; latest release tag.
+        btop: {
+            install: [
+                { via: source  repo: "https://github.com/aristocratos/btop"
+                  version: { github: aristocratos/btop }  requires: [ cxx, make ]
+                  build: "make && make install PREFIX=$PREFIX" }
+            ]
+        }
+        // fastfetch: CMake; optional feature libs are auto-detected/skipped. Folded from core.
+        fastfetch: {
+            install: [
+                { via: source  repo: "https://github.com/fastfetch-cli/fastfetch"
+                  version: { github: fastfetch-cli/fastfetch }  requires: [ cc, cmake ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX && cmake --build build && cmake --install build" }
+            ]
+        }
 
         // ----- C / autotools (git checkout -> autogen -> configure -> make) ---------------------
         // htop: only hard dev-lib dep is ncurses (wide); sensors/capabilities/delayacct auto-skip
