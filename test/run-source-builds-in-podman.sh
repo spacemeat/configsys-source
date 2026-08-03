@@ -31,6 +31,12 @@ rows=(
 'k9s|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o k9s . && install -Dm755 k9s /root/.local/bin/k9s && /root/.local/bin/k9s version --short'
 'just|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release && install -Dm755 target/release/just /root/.local/bin/just && /root/.local/bin/just --version'
 'jq|fedora:41|dnf install -y -q gcc make autoconf automake libtool bison flex git|git submodule update --init && autoreconf -fi && ./configure --prefix=/root/.local --with-oniguruma=builtin --disable-maintainer-mode && make && make install && /root/.local/bin/jq --version'
+'opentofu|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o tofu ./cmd/tofu && install -Dm755 tofu /root/.local/bin/tofu && /root/.local/bin/tofu version'
+'bazelisk|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o bazelisk . && install -Dm755 bazelisk /root/.local/bin/bazelisk && test -x /root/.local/bin/bazelisk && echo built'
+'grpcurl|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o grpcurl ./cmd/grpcurl && install -Dm755 grpcurl /root/.local/bin/grpcurl && /root/.local/bin/grpcurl --version'
+'nushell|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release --bin nu && install -Dm755 target/release/nu /root/.local/bin/nu && /root/.local/bin/nu --version'
+'yazi|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release --locked && install -Dm755 target/release/yazi /root/.local/bin/yazi && install -Dm755 target/release/ya /root/.local/bin/ya && /root/.local/bin/yazi --version'
+'mtr|fedora:41|dnf install -y -q gcc make autoconf automake pkgconf-pkg-config ncurses-devel git|./bootstrap.sh && ./configure --prefix=/root/.local --sbindir=/root/.local/bin --without-gtk && make && make install && /root/.local/bin/mtr --version'
 )
 
 declare -A repo=(
@@ -40,6 +46,9 @@ declare -A repo=(
   [btop]=https://github.com/aristocratos/btop [fastfetch]=https://github.com/fastfetch-cli/fastfetch
   [lazydocker]=https://github.com/jesseduffield/lazydocker [lazysql]=https://github.com/jorgerojas26/lazysql
   [k9s]=https://github.com/derailed/k9s [just]=https://github.com/casey/just [jq]=https://github.com/jqlang/jq
+  [opentofu]=https://github.com/opentofu/opentofu [bazelisk]=https://github.com/bazelbuild/bazelisk
+  [grpcurl]=https://github.com/fullstorydev/grpcurl [nushell]=https://github.com/nushell/nushell
+  [yazi]=https://github.com/sxyazi/yazi [mtr]=https://github.com/traviscross/mtr
 )
 
 fail=0

@@ -39,6 +39,24 @@
                   build: "cargo build --release && install -Dm755 target/release/just $PREFIX/bin/just" }
             ]
         }
+        // nushell (`nu`): the workspace root IS the `nu` package; default features use rustls (no
+        // system openssl/pkg-config). `--bin nu` is belt-and-suspenders. Bare-version tags.
+        nushell: {
+            install: [
+                { via: source  repo: "https://github.com/nushell/nushell"
+                  version: { github: nushell/nushell }  requires: cargo
+                  build: "cargo build --release --bin nu && install -Dm755 target/release/nu $PREFIX/bin/nu" }
+            ]
+        }
+        // yazi: builds TWO binaries — `yazi` (yazi-fm) and `ya` (yazi-cli) — from the workspace.
+        // `--locked` per upstream; pure-Rust crypto (no system openssl). vX.Y.Z tags.
+        yazi: {
+            install: [
+                { via: source  repo: "https://github.com/sxyazi/yazi"
+                  version: { github: sxyazi/yazi  strip-v: true }  tag-prefix: "v"  requires: cargo
+                  build: "cargo build --release --locked && install -Dm755 target/release/yazi $PREFIX/bin/yazi && install -Dm755 target/release/ya $PREFIX/bin/ya" }
+            ]
+        }
         // helix DEFERRED — the recipe (cargo install helix-term + auto tree-sitter grammars +
         // symlink $SRC/runtime -> $PREFIX/bin/runtime) is otherwise correct, but helix's build
         // AUTO-FETCHES its grammar repos and a single rotted upstream (e.g. `gotmpl`, which prompts
@@ -97,6 +115,31 @@
                   build: "CGO_ENABLED=0 go build -o k9s . && install -Dm755 k9s $PREFIX/bin/k9s" }
             ]
         }
+        // opentofu (`tofu`): main at ./cmd/tofu. High go.mod floor (patch-pinned ~1.26) — the
+        // version-floors plugin tracks it, and a floor advisory points at `go tarball` if the
+        // distro Go is older.
+        opentofu: {
+            install: [
+                { via: source  repo: "https://github.com/opentofu/opentofu"
+                  version: { github: opentofu/opentofu  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o tofu ./cmd/tofu && install -Dm755 tofu $PREFIX/bin/tofu" }
+            ]
+        }
+        // bazelisk: main at the repo ROOT (not ./cmd). grpcurl: main at ./cmd/grpcurl.
+        bazelisk: {
+            install: [
+                { via: source  repo: "https://github.com/bazelbuild/bazelisk"
+                  version: { github: bazelbuild/bazelisk  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o bazelisk . && install -Dm755 bazelisk $PREFIX/bin/bazelisk" }
+            ]
+        }
+        grpcurl: {
+            install: [
+                { via: source  repo: "https://github.com/fullstorydev/grpcurl"
+                  version: { github: fullstorydev/grpcurl  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o grpcurl ./cmd/grpcurl && install -Dm755 grpcurl $PREFIX/bin/grpcurl" }
+            ]
+        }
 
         // ----- C / C++ (make + cmake) -----------------------------------------------------------
         // btop: C++ Makefile, installs under the prefix. Folded from core; latest release tag.
@@ -153,5 +196,24 @@
                   uninstall-cmd: "make uninstall" }
             ]
         }
+        // mtr: autotools via ./bootstrap.sh. Installs mtr/mtr-packet as sbin_PROGRAMS, so force
+        // --sbindir=$PREFIX/bin to land them on PATH; --without-gtk keeps it TUI-only (ncurses).
+        // (Raw-socket perms are a runtime concern for ANY userland mtr — run via sudo or setcap.)
+        mtr: {
+            install: [
+                { via: source  repo: "https://github.com/traviscross/mtr"
+                  version: { github: traviscross/mtr  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, make, autoconf, automake, pkg-config, ncurses ]
+                  build: "./bootstrap.sh && ./configure --prefix=$PREFIX --sbindir=$PREFIX/bin --without-gtk && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // socat DEFERRED — the recipe itself is fine (`autoconf` only [not autoreconf — its
+        // hand-maintained config.h.in breaks autoheader], then ./configure && make; openssl +
+        // readline enable those address types). But socat's only current git source is repo.or.cz
+        // (the github `dest-unreach/socat1` mirror is stale, and the dest-unreach.org tarball serves
+        // a self-signed cert), and a full clone from repo.or.cz is flaky from CI/containers — an
+        // un-gateable, restricted-network-hostile source. Revisit if a reliable github mirror or
+        // release appears.
     }
 }
