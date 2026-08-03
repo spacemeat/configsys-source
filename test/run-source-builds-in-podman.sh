@@ -23,12 +23,16 @@ rows=(
 'superfile|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o spf . && install -Dm755 spf /root/.local/bin/spf && /root/.local/bin/spf --version'
 'htop|fedora:41|dnf install -y -q gcc make autoconf automake pkgconf-pkg-config ncurses-devel git|./autogen.sh && ./configure --prefix=/root/.local && make && make install && /root/.local/bin/htop --version'
 'tmux|fedora:41|dnf install -y -q gcc make autoconf automake pkgconf-pkg-config ncurses-devel libevent-devel bison git|sh autogen.sh && ./configure --prefix=/root/.local && make && make install && /root/.local/bin/tmux -V'
+'fzf|archlinux:latest|pacman -Sy --noconfirm --needed go git|mkdir -p /root/.local/bin && go build -o /root/.local/bin/fzf && /root/.local/bin/fzf --version'
+'btop|fedora:41|dnf install -y -q gcc-c++ make git|make && make install PREFIX=/root/.local && /root/.local/bin/btop --version'
+'fastfetch|fedora:41|dnf install -y -q gcc cmake make git|cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local && cmake --build build && cmake --install build && /root/.local/bin/fastfetch --version'
 )
 
 declare -A repo=(
   [ripgrep]=https://github.com/BurntSushi/ripgrep [lazygit]=https://github.com/jesseduffield/lazygit
   [superfile]=https://github.com/yorukot/superfile [htop]=https://github.com/htop-dev/htop
-  [tmux]=https://github.com/tmux/tmux
+  [tmux]=https://github.com/tmux/tmux [fzf]=https://github.com/junegunn/fzf
+  [btop]=https://github.com/aristocratos/btop [fastfetch]=https://github.com/fastfetch-cli/fastfetch
 )
 
 fail=0
