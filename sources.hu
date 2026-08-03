@@ -223,6 +223,16 @@
                   build: "make && make install prefix=$PREFIX" }
             ]
         }
+        // cmake: bootstraps itself (./bootstrap uses the system compiler + bundled deps), then make.
+        // Slow (~10 min). vX.Y.Z tags. [VERIFIED: built cmake 4.4 on fedora:41.]
+        cmake: {
+            install: [
+                { via: source  repo: "https://github.com/Kitware/CMake"
+                  version: { github: Kitware/CMake  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, cxx, make ]
+                  build: "./bootstrap --prefix=$PREFIX --parallel=$(nproc) && make -j$(nproc) && make install" }
+            ]
+        }
 
         // ----- C / autotools (git checkout -> autogen -> configure -> make) ---------------------
         // htop: only hard dev-lib dep is ncurses (wide); sensors/capabilities/delayacct auto-skip
@@ -346,6 +356,19 @@
                   repo: "https://github.com/JasonFerrara/jmtpfs"
                   requires: [ cxx, make, pkg-config, libmtp, fuse, libusb, libmagic ]
                   build: "./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // ffmpeg: custom ./configure (NOT autotools). BASELINE build — built-in codecs/muxers only
+        // (no external libx264/libmp3lame/x265/...); add those libs + the matching --enable-* for a
+        // fuller build. Needs nasm (x86 asm). NO github Releases (the repo is a mirror), tags are
+        // `nX.Y.Z` -> static version pin + tag-prefix n. [VERIFIED: built ffmpeg on fedora:41.]
+        ffmpeg: {
+            install: [
+                { via: source  version: { static: "8.1.2" }  tag-prefix: "n"
+                  repo: "https://github.com/FFmpeg/FFmpeg"
+                  requires: [ cc, make, nasm ]
+                  build: "./configure --prefix=$PREFIX --disable-doc --enable-gpl && make -j$(nproc) && make install"
                   uninstall-cmd: "make uninstall" }
             ]
         }

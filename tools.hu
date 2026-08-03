@@ -16,6 +16,7 @@
         bison:      { install: [ { via: native } ] }   // the yacc a few grammars (tmux) need
         flex:       { install: [ { via: native } ] }   // the lexer jq's regenerated parser needs
         perl:       { install: [ { via: native } ] }   // git's default build compiles perl tooling
+        nasm:       { install: [ { via: native } ] }   // x86 assembler (ffmpeg); same name everywhere
 
         // --- dev libraries (headers + libs). Debian/Fedora/openSUSE split a -dev/-devel package;
         // Arch (and the component-name default) don't split, so the base name carries headers. ---
