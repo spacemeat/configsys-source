@@ -37,6 +37,14 @@ rows=(
 'nushell|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release --bin nu && install -Dm755 target/release/nu /root/.local/bin/nu && /root/.local/bin/nu --version'
 'yazi|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release --locked && install -Dm755 target/release/yazi /root/.local/bin/yazi && install -Dm755 target/release/ya /root/.local/bin/ya && /root/.local/bin/yazi --version'
 'mtr|fedora:41|dnf install -y -q gcc make autoconf automake pkgconf-pkg-config ncurses-devel git|./bootstrap.sh && ./configure --prefix=/root/.local --sbindir=/root/.local/bin --without-gtk && make && make install && /root/.local/bin/mtr --version'
+'curl|fedora:41|dnf install -y -q gcc make autoconf automake libtool pkgconf-pkg-config openssl-devel zlib-devel git|autoreconf -fi && ./configure --prefix=/root/.local --with-openssl --with-zlib --without-libpsl && make && make install && /root/.local/bin/curl --version'
+'helm|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -trimpath -o helm ./cmd/helm && install -Dm755 helm /root/.local/bin/helm && /root/.local/bin/helm version'
+# NOTE: git and nmap are source-buildable and verified out-of-band, but are NOT gated here.
+# Both trip a rootless-podman user-namespace quirk where `tar` cannot chmod certain archived
+# dirs as container-root (git's install-time template tree; nmap's bundled `zenmap` dir on
+# extraction) — a sandbox limitation, not a recipe fault (both extract+build fine as a real
+# user). Verified by hand: git 2.47.1 (+ working git-remote-https clone); nmap 7.99 (C++ compile,
+# host-extracted tree built in-container).
 )
 
 declare -A repo=(
@@ -49,6 +57,7 @@ declare -A repo=(
   [opentofu]=https://github.com/opentofu/opentofu [bazelisk]=https://github.com/bazelbuild/bazelisk
   [grpcurl]=https://github.com/fullstorydev/grpcurl [nushell]=https://github.com/nushell/nushell
   [yazi]=https://github.com/sxyazi/yazi [mtr]=https://github.com/traviscross/mtr
+  [curl]=https://github.com/curl/curl [helm]=https://github.com/helm/helm
 )
 
 fail=0

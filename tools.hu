@@ -15,10 +15,16 @@
         libtool:    { install: [ { via: native } ] }
         bison:      { install: [ { via: native } ] }   // the yacc a few grammars (tmux) need
         flex:       { install: [ { via: native } ] }   // the lexer jq's regenerated parser needs
+        perl:       { install: [ { via: native } ] }   // git's default build compiles perl tooling
 
         // --- dev libraries (headers + libs). Debian/Fedora/openSUSE split a -dev/-devel package;
         // Arch (and the component-name default) don't split, so the base name carries headers. ---
         ncurses:  { install: [ { via: native  name: { apt: libncurses-dev  dnf: ncurses-devel   apk: ncurses-dev   zypper: ncurses-devel } } ] }
         libevent: { install: [ { via: native  name: { apt: libevent-dev    dnf: libevent-devel  apk: libevent-dev  zypper: libevent-devel } } ] }
+        openssl:  { install: [ { via: native  name: { apt: libssl-dev      dnf: openssl-devel   apk: openssl-dev   zypper: libopenssl-devel } } ] }
+        zlib:     { install: [ { via: native  name: { apt: zlib1g-dev      dnf: zlib-devel      apk: zlib-dev      zypper: zlib-devel } } ] }
+        libcurl:  { install: [ { via: native  name: { apt: libcurl4-openssl-dev  dnf: libcurl-devel  pacman: curl  apk: curl-dev  zypper: libcurl-devel } } ] }
+        expat:    { install: [ { via: native  name: { apt: libexpat1-dev   dnf: expat-devel     pacman: expat  apk: expat-dev    zypper: libexpat-devel } } ] }
+        gettext:  { install: [ { via: native  name: { apk: gettext-dev     zypper: gettext-tools } } ] }   // msgfmt/libintl for i18n
     }
 }

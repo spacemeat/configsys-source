@@ -140,6 +140,16 @@
                   build: "CGO_ENABLED=0 go build -o grpcurl ./cmd/grpcurl && install -Dm755 grpcurl $PREFIX/bin/grpcurl" }
             ]
         }
+        // helm: main at ./cmd/helm. Plain build (no version ldflags) — the version vars have safe
+        // in-source defaults, so `helm version` is cosmetic-only and it's v3/v4-agnostic. High go
+        // floor (~1.26). vX.Y.Z tags.
+        helm: {
+            install: [
+                { via: source  repo: "https://github.com/helm/helm"
+                  version: { github: helm/helm  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -trimpath -o helm ./cmd/helm && install -Dm755 helm $PREFIX/bin/helm" }
+            ]
+        }
 
         // ----- C / C++ (make + cmake) -----------------------------------------------------------
         // btop: C++ Makefile, installs under the prefix. Folded from core; latest release tag.
@@ -205,6 +215,46 @@
                   version: { github: traviscross/mtr  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, make, autoconf, automake, pkg-config, ncurses ]
                   build: "./bootstrap.sh && ./configure --prefix=$PREFIX --sbindir=$PREFIX/bin --without-gtk && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // curl: autotools; a git checkout has no configure (autoreconf -fi first). System OpenSSL +
+        // zlib for HTTP/HTTPS; --without-libpsl (since 7.81 configure errors without a psl decision).
+        // Its tag is `curl-<version, dots→underscores>` and the discovered tag_name IS that full ref
+        // (so no tag-prefix / strip-v — the resolver checks out tag_name verbatim).
+        curl: {
+            install: [
+                { via: source  repo: "https://github.com/curl/curl"
+                  version: { github: curl/curl }
+                  requires: [ cc, make, pkg-config, autoconf, automake, libtool, openssl, zlib ]
+                  build: "autoreconf -fi && ./configure --prefix=$PREFIX --with-openssl --with-zlib --without-libpsl && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // git: hand-written Makefile (NO autotools) — plain `make prefix=` is the documented path;
+        // NO_TCLTK skips the gitk/git-gui GUIs. HTTPS clone auto-detects libcurl at build time, so
+        // it's a HARD `requires:` here (configsys installs the dev-libs before the build, turning a
+        // silent no-HTTPS build into "won't resolve"). expat=http-push, gettext=i18n, perl=tooling.
+        // (No `make uninstall` — the source driver removes the prefix tree.) vX.Y.Z tags.
+        git: {
+            install: [
+                { via: source  repo: "https://github.com/git/git"
+                  version: { github: git/git  strip-v: true }  tag-prefix: "v"
+                  requires: [ cc, make, zlib, libcurl, openssl, expat, gettext, perl ]
+                  build: "make -j$(nproc) prefix=$PREFIX NO_TCLTK=1 all && make prefix=$PREFIX NO_TCLTK=1 install" }
+            ]
+        }
+        // nmap: its github repo is a TAGLESS SVN mirror, so build from the upstream release TARBALL
+        // (nmap.org, valid cert) — an ARCHIVE binding, not git. C++; ships ./configure (no
+        // autoreconf); BUNDLES openssl/libpcap/zlib/pcre/lua, so it builds self-contained with just a
+        // C/C++ toolchain (the vendored crypto is frozen — add `openssl` + `--with-openssl=/usr` for
+        // distro-tracked TLS if preferred). Static version pin, manually bumped (nmap releases ~yearly).
+        nmap: {
+            install: [
+                { via: source  version: { static: 7.99 }
+                  url: "https://nmap.org/dist/nmap-$VERSION.tar.bz2"
+                  requires: [ cxx, cc, make ]
+                  build: "./configure --prefix=$PREFIX && make && make install"
                   uninstall-cmd: "make uninstall" }
             ]
         }
