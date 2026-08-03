@@ -14,6 +14,7 @@
         automake:   { install: [ { via: native } ] }
         libtool:    { install: [ { via: native } ] }
         bison:      { install: [ { via: native } ] }   // the yacc a few grammars (tmux) need
+        flex:       { install: [ { via: native } ] }   // the lexer jq's regenerated parser needs
 
         // --- dev libraries (headers + libs). Debian/Fedora/openSUSE split a -dev/-devel package;
         // Arch (and the component-name default) don't split, so the base name carries headers. ---

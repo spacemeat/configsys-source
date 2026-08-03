@@ -26,6 +26,11 @@ rows=(
 'fzf|archlinux:latest|pacman -Sy --noconfirm --needed go git|mkdir -p /root/.local/bin && go build -o /root/.local/bin/fzf && /root/.local/bin/fzf --version'
 'btop|fedora:41|dnf install -y -q gcc-c++ make git|make && make install PREFIX=/root/.local && /root/.local/bin/btop --version'
 'fastfetch|fedora:41|dnf install -y -q gcc cmake make git|cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local && cmake --build build && cmake --install build && /root/.local/bin/fastfetch --version'
+'lazydocker|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o lazydocker . && install -Dm755 lazydocker /root/.local/bin/lazydocker && /root/.local/bin/lazydocker --version'
+'lazysql|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o lazysql . && install -Dm755 lazysql /root/.local/bin/lazysql && /root/.local/bin/lazysql --version'
+'k9s|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o k9s . && install -Dm755 k9s /root/.local/bin/k9s && /root/.local/bin/k9s version --short'
+'just|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release && install -Dm755 target/release/just /root/.local/bin/just && /root/.local/bin/just --version'
+'jq|fedora:41|dnf install -y -q gcc make autoconf automake libtool bison flex git|git submodule update --init && autoreconf -fi && ./configure --prefix=/root/.local --with-oniguruma=builtin --disable-maintainer-mode && make && make install && /root/.local/bin/jq --version'
 )
 
 declare -A repo=(
@@ -33,6 +38,8 @@ declare -A repo=(
   [superfile]=https://github.com/yorukot/superfile [htop]=https://github.com/htop-dev/htop
   [tmux]=https://github.com/tmux/tmux [fzf]=https://github.com/junegunn/fzf
   [btop]=https://github.com/aristocratos/btop [fastfetch]=https://github.com/fastfetch-cli/fastfetch
+  [lazydocker]=https://github.com/jesseduffield/lazydocker [lazysql]=https://github.com/jorgerojas26/lazysql
+  [k9s]=https://github.com/derailed/k9s [just]=https://github.com/casey/just [jq]=https://github.com/jqlang/jq
 )
 
 fail=0

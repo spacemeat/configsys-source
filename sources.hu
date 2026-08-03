@@ -31,6 +31,20 @@
                   build: "cargo build --release && install -Dm755 target/release/rg $PREFIX/bin/rg" }
             ]
         }
+        // just: pure Rust cargo build (bare-semver tags; MSRV lives in the version-floors plugin).
+        just: {
+            install: [
+                { via: source  repo: "https://github.com/casey/just"
+                  version: { github: casey/just }  requires: cargo
+                  build: "cargo build --release && install -Dm755 target/release/just $PREFIX/bin/just" }
+            ]
+        }
+        // helix DEFERRED — the recipe (cargo install helix-term + auto tree-sitter grammars +
+        // symlink $SRC/runtime -> $PREFIX/bin/runtime) is otherwise correct, but helix's build
+        // AUTO-FETCHES its grammar repos and a single rotted upstream (e.g. `gotmpl`, which prompts
+        // for github auth and fails) breaks the WHOLE build — with no clean declarative workaround
+        // (`hx --grammar fetch` fails on the same repo). This grammar-repo fragility is exactly the
+        // "gnarly build" that warrants a bespoke plugin (like blender/kicad), not a data recipe.
 
         // ----- Go (needs `go`) ------------------------------------------------------------------
         // NOTE: `go` installs the DISTRO Go (golang-go/golang), which can be older than these
@@ -58,6 +72,29 @@
                 { via: source  repo: "https://github.com/junegunn/fzf"
                   version: { github: junegunn/fzf }  requires: go
                   build: "mkdir -p $PREFIX/bin && go build -o $PREFIX/bin/fzf" }
+            ]
+        }
+        // lazydocker / lazysql / k9s: single-module pure-Go tools, main pkg at the repo root.
+        // (k9s wants a recent Go — its go.mod floor is high; the version-floors plugin tracks it.)
+        lazydocker: {
+            install: [
+                { via: source  repo: "https://github.com/jesseduffield/lazydocker"
+                  version: { github: jesseduffield/lazydocker  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o lazydocker . && install -Dm755 lazydocker $PREFIX/bin/lazydocker" }
+            ]
+        }
+        lazysql: {
+            install: [
+                { via: source  repo: "https://github.com/jorgerojas26/lazysql"
+                  version: { github: jorgerojas26/lazysql  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o lazysql . && install -Dm755 lazysql $PREFIX/bin/lazysql" }
+            ]
+        }
+        k9s: {
+            install: [
+                { via: source  repo: "https://github.com/derailed/k9s"
+                  version: { github: derailed/k9s  strip-v: true }  tag-prefix: "v"  requires: go
+                  build: "CGO_ENABLED=0 go build -o k9s . && install -Dm755 k9s $PREFIX/bin/k9s" }
             ]
         }
 
@@ -100,6 +137,19 @@
                   version: { github: tmux/tmux }
                   requires: [ cc, make, autoconf, automake, pkg-config, bison, ncurses, libevent ]
                   build: "sh autogen.sh && ./configure --prefix=$PREFIX && make && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
+        // jq: autotools, but a git checkout ships no `configure` (regenerate with autoreconf) and
+        // its oniguruma is a vendored SUBMODULE — init it first, then `--with-oniguruma=builtin`
+        // (no system libonig). The regenerated parser/lexer need bison>=3 + flex. Tags are
+        // `jq-X.Y.Z`, and the discovered tag_name IS that full ref, so no tag-prefix / strip-v.
+        jq: {
+            install: [
+                { via: source  repo: "https://github.com/jqlang/jq"
+                  version: { github: jqlang/jq }
+                  requires: [ cc, make, autoconf, automake, libtool, bison, flex ]
+                  build: "git submodule update --init && autoreconf -fi && ./configure --prefix=$PREFIX --with-oniguruma=builtin --disable-maintainer-mode && make && make install"
                   uninstall-cmd: "make uninstall" }
             ]
         }
