@@ -379,5 +379,24 @@
         // a self-signed cert), and a full clone from repo.or.cz is flaky from CI/containers — an
         // un-gateable, restricted-network-hostile source. Revisit if a reliable github mirror or
         // release appears.
+
+        // ----- C++ / CMake libraries (NEW components — source-only) -----------------------------
+        // Fast DDS (eProsima) — DDS/RTPS middleware (the default ROS 2 RMW). NOT in any distro
+        // repo, so `source` is its ONLY install method: it builds by default (correct — there is no
+        // binary alternative to lose a default to). A standalone CMake build with -DTHIRDPARTY=ON
+        // compiles + bundles its own deps (Fast-CDR, foonathan_memory, TinyXML2), so no separate
+        // dependency components are needed; OpenSSL provides the DDS security transport. NOTE: the
+        // libraries install under $PREFIX/lib (~/.local/lib for a user build) — put that on your
+        // loader path (LD_LIBRARY_PATH, or ldconfig for a system prefix) to link/run against them.
+        // [UNVERIFIED: transcribed from eProsima's CMake-install docs, not container-built.]
+        fastdds: {
+            description: "eProsima Fast DDS — DDS/RTPS middleware (the default ROS 2 RMW)."
+            install: [
+                { via: source  repo: "https://github.com/eProsima/Fast-DDS"
+                  version: { github: eProsima/Fast-DDS  strip-v: true }  tag-prefix: "v"
+                  requires: [ cxx, cmake, openssl ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF . && cmake --build build -j$(nproc) --target install" }
+            ]
+        }
     }
 }
