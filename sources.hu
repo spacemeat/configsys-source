@@ -398,5 +398,28 @@
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF . && cmake --build build -j$(nproc) --target install" }
             ]
         }
+        // EASTL (Electronic Arts) — an STL-alternative C++ template library. Only Arch (AUR) packages
+        // it, so `source` is the install method on every other distro (it's the sole method there, so
+        // it builds by default — correct, there's no binary alternative to lose a default to; on Arch
+        // the AUR package stays the default and this is a candidate). Standalone CMake build: EASTL's
+        // CMakeLists FetchContent-downloads its one dependency (EABase) at configure time, so no
+        // separate dep components are needed. Installs libEASTL + the EASTL headers under $PREFIX/{lib,
+        // include}. [UNVERIFIED: transcribed from EASTL's CMakeLists, not container-built.]
+        eastl: {
+            install: [
+                { via: source  repo: "https://github.com/electronicarts/EASTL"
+                  version: { github: electronicarts/EASTL }
+                  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DEASTL_BUILD_TESTS=OFF -DEASTL_BUILD_BENCHMARK=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+            ]
+        }
+        // folly (Facebook) DEFERRED — the "gnarly build that warrants a bespoke plugin" case (like
+        // blender/kicad, and helix/socat above), NOT a declarative recipe. Its supported build is
+        // `build/fbcode_builder/getdeps.py`, which fetches + builds folly's large dependency tree
+        // (boost, fmt, gflags, glog, double-conversion, libevent, zstd, …) into a SCRATCH directory
+        // (found via `getdeps.py show-inst-dir`) — not a clean `--prefix` install this recipe could
+        // point at $PREFIX. A direct CMake build instead needs ~10 dependency components configsys
+        // doesn't ship. Revisit as a bespoke configsys-folly plugin (blender-shaped: a driver that
+        // runs getdeps, then relocates its install tree into the scope-honored prefix).
     }
 }
