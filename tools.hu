@@ -24,6 +24,16 @@
         libevent: { install: [ { via: native  name: { apt: libevent-dev    dnf: libevent-devel  apk: libevent-dev  zypper: libevent-devel } } ] }
         openssl:  { install: [ { via: native  name: { apt: libssl-dev      dnf: openssl-devel   apk: openssl-dev   zypper: libopenssl-devel } } ] }
         zlib:     { install: [ { via: native  name: { apt: zlib1g-dev      dnf: zlib-devel      apk: zlib-dev      zypper: zlib-devel } } ] }
+        // C++ dev-libs for folly (also have `source` alternatives in sources.hu). Arch names verified
+        // (glog = google-glog there); apt/dnf/apk/zypper are the standard lib*-dev / *-devel forms —
+        // confirm with a name sweep as repos roll. `default` (component name) covers pacman where it
+        // matches (fmt/gflags/double-conversion/snappy/bzip2).
+        fmt:      { install: [ { via: native  name: { apt: libfmt-dev      dnf: fmt-devel       apk: fmt-dev       zypper: fmt-devel } } ] }
+        gflags:   { install: [ { via: native  name: { apt: libgflags-dev   dnf: gflags-devel    apk: gflags-dev    zypper: gflags-devel } } ] }
+        glog:     { install: [ { via: native  name: { apt: libgoogle-glog-dev  dnf: glog-devel  pacman: google-glog  apk: glog-dev  zypper: glog-devel } } ] }
+        double-conversion: { install: [ { via: native  name: { apt: libdouble-conversion-dev  dnf: double-conversion-devel  apk: double-conversion-dev  zypper: double-conversion-devel } } ] }
+        snappy:   { install: [ { via: native  name: { apt: libsnappy-dev   dnf: snappy-devel    apk: snappy-dev    zypper: snappy-devel } } ] }
+        bzip2:    { install: [ { via: native  name: { apt: libbz2-dev      dnf: bzip2-devel     apk: bzip2-dev     zypper: libbz2-devel } } ] }
         libcurl:  { install: [ { via: native  name: { apt: libcurl4-openssl-dev  dnf: libcurl-devel  pacman: curl  apk: curl-dev  zypper: libcurl-devel } } ] }
         expat:    { install: [ { via: native  name: { apt: libexpat1-dev   dnf: expat-devel     pacman: expat  apk: expat-dev    zypper: libexpat-devel } } ] }
         gettext:  { install: [ { via: native  name: { apk: gettext-dev     zypper: gettext-tools } } ] }   // msgfmt/libintl for i18n

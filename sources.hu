@@ -413,13 +413,68 @@
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DEASTL_BUILD_TESTS=OFF -DEASTL_BUILD_BENCHMARK=OFF && cmake --build build -j$(nproc) && cmake --install build" }
             ]
         }
-        // folly (Facebook) DEFERRED — the "gnarly build that warrants a bespoke plugin" case (like
-        // blender/kicad, and helix/socat above), NOT a declarative recipe. Its supported build is
-        // `build/fbcode_builder/getdeps.py`, which fetches + builds folly's large dependency tree
-        // (boost, fmt, gflags, glog, double-conversion, libevent, zstd, …) into a SCRATCH directory
-        // (found via `getdeps.py show-inst-dir`) — not a clean `--prefix` install this recipe could
-        // point at $PREFIX. A direct CMake build instead needs ~10 dependency components configsys
-        // doesn't ship. Revisit as a bespoke configsys-folly plugin (blender-shaped: a driver that
-        // runs getdeps, then relocates its install tree into the scope-honored prefix).
+        // --- folly's C++-library dependencies (also useful standalone) ---------------------------
+        // These add a `source` alternative to the native dev-lib components (tools.hu); folly (below)
+        // requires them, and they're common enough to want on their own. All plain CMake with a real
+        // install target; built SHARED to match the distro packages. [UNVERIFIED: transcribed from
+        // each project's CMake, not container-built.]
+        // fmt: bare-version tags (12.2.0). Header+lib formatting library.
+        fmt: {
+            install: [
+                { via: source  repo: "https://github.com/fmtlib/fmt"
+                  version: { github: fmtlib/fmt }  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DFMT_TEST=OFF -DFMT_DOC=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+            ]
+        }
+        gflags: {
+            install: [
+                { via: source  repo: "https://github.com/gflags/gflags"
+                  version: { github: gflags/gflags  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_TESTING=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+            ]
+        }
+        // glog: auto-detects gflags if present (folly pulls both). Tests off.
+        glog: {
+            install: [
+                { via: source  repo: "https://github.com/google/glog"
+                  version: { github: google/glog  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DWITH_GTEST=OFF -DBUILD_TESTING=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+            ]
+        }
+        double-conversion: {
+            install: [
+                { via: source  repo: "https://github.com/google/double-conversion"
+                  version: { github: google/double-conversion  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON && cmake --build build -j$(nproc) && cmake --install build" }
+            ]
+        }
+        // fast_float: header-only (folly REQUIREs it; it's spottily packaged, so source is the safe
+        // route). `-DFASTFLOAT_INSTALL=ON` installs the headers + a CMake config package.
+        fast_float: {
+            install: [
+                { via: source  repo: "https://github.com/fastfloat/fast_float"
+                  version: { github: fastfloat/fast_float  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DFASTFLOAT_INSTALL=ON -DFASTFLOAT_TEST=OFF && cmake --install build" }
+            ]
+        }
+
+        // folly (Facebook) — the reason for the deps above. Now a plain-CMake `source` recipe (NOT a
+        // getdeps/bespoke-plugin): folly's CMake find_package()s its deps, so with them installed it
+        // builds directly into $PREFIX. requires: pulls the whole set — native where the distro
+        // packages it (default), the `source` recipes above otherwise. libaio/liburing/libdwarf/
+        // libunwind/libsodium are OPTIONAL feature libs folly auto-skips if absent, so they're not
+        // required here. VERSION-FRAGILE: folly tracks recent boost/fmt, so an older distro (e.g.
+        // Ubuntu 22.04's boost 1.74 / fmt 8) may fail cmake — build on a current distro or pin deps.
+        // [UNVERIFIED: transcribed from folly's CMake/folly-deps.cmake, not container-built.]
+        folly: {
+            description: "Folly — Facebook's C++ component library (Facebook Open-source Library)."
+            install: [
+                { via: source  repo: "https://github.com/facebook/folly"
+                  version: { github: facebook/folly  strip-v: true }  tag-prefix: "v"
+                  requires: [ cxx, cmake, make, boost, openssl, libevent, fmt, fast_float, gflags, glog,
+                              double-conversion, zstd, lz4, snappy, bzip2 ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) && cmake --install build" }
+            ]
+        }
     }
 }
