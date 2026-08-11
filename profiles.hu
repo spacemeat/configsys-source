@@ -1,0 +1,19 @@
+{
+    // Profile amendments — where this plugin wires its source-built components INTO the profiles
+    // that ship in the repo. Each entry AMENDS the lower-layer definition via `+<name>` (self-
+    // include) and adds members, so:
+    //   * loading configsys-source injects these components into the named profile,
+    //   * removing the plugin cleanly withdraws them (the amend disappears with its layer),
+    //   * your own primary-plugin / top-config amendments to the same profile still compose
+    //     on top (all `+self` amends stack: repo -> here -> your primary).
+    //
+    // A plugin may POPULATE a profile but not ACTIVATE it — `configs:` is a machine setting and
+    // stays your local choice. Name the profile exactly as the repo does (dev, web-dev, …) so the
+    // `+self` term hooks the right base; a name with no lower definition just becomes a fresh
+    // profile this plugin owns.
+    profiles: {
+        // folly is only buildable via this plugin's `source` recipe, so its home in `dev` lives
+        // here too — the capability and its profile placement arrive (and leave) together.
+        dev: [ +dev  folly ]
+    }
+}
