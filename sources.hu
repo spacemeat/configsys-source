@@ -460,11 +460,14 @@
 
         // folly (Facebook) — the reason for the deps above. Now a plain-CMake `source` recipe (NOT a
         // getdeps/bespoke-plugin): folly's CMake find_package()s its deps, so with them installed it
-        // builds directly into $PREFIX. requires: pulls the whole set — native where the distro
-        // packages it (default), the `source` recipes above otherwise. libaio/liburing/libdwarf/
-        // libunwind/libsodium are OPTIONAL feature libs folly auto-skips if absent, so they're not
-        // required here. VERSION-FRAGILE: folly tracks recent boost/fmt, so an older distro (e.g.
-        // Ubuntu 22.04's boost 1.74 / fmt 8) may fail cmake — build on a current distro or pin deps.
+        // builds directly into $PREFIX. requires: pulls the codec/core set (native where the distro
+        // packages it, the `source` recipes above otherwise); suggests: pulls the OPTIONAL feature
+        // libs (libsodium=crypto, liburing/libaio=async IO, libunwind/libdwarf/libiberty=stack
+        // symbolization) — soft, so folly skips any a distro lacks (matching folly's own auto-skip).
+        // VERSION-FRAGILE: folly tracks recent boost/fmt, so an older distro (e.g. Ubuntu 22.04's
+        // boost 1.74 / fmt 8) may fail cmake — build on a current distro or pin deps. Resolves on
+        // debian/ubuntu/fedora/arch/alpine; on openSUSE it honestly errors — base `boost` has no
+        // openSUSE binding (it splits into per-lib `-devel`s; a DEFERRED base gap).
         // [UNVERIFIED: transcribed from folly's CMake/folly-deps.cmake, not container-built.]
         folly: {
             description: "Folly — Facebook's C++ component library (Facebook Open-source Library)."
@@ -473,6 +476,7 @@
                   version: { github: facebook/folly  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake, make, boost, openssl, libevent, zlib, fmt, fast_float, gflags,
                               glog, double-conversion, libzstd, liblz4, snappy, bzip2 ]
+                  suggests: [ libsodium, liburing, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) && cmake --install build" }
             ]
         }

@@ -38,6 +38,17 @@
         // `compression` bundle + required by ollama). folly links against these headers/libs.
         libzstd:  { install: [ { via: native  name: { apt: libzstd-dev     dnf: libzstd-devel   pacman: zstd  apk: zstd-dev  zypper: libzstd-devel } } ] }
         liblz4:   { install: [ { via: native  name: { apt: liblz4-dev      dnf: lz4-devel       pacman: lz4   apk: lz4-dev   zypper: liblz4-devel } } ] }
+        // folly's OPTIONAL feature libs (folly `suggests:` these — soft, auto-skipped where a distro
+        // lacks them). libsodium=crypto; liburing/libaio=async-IO event backends; libunwind/libdwarf/
+        // libiberty=stack symbolization. The spotty ones are `when:`-gated so they don't resolve (and
+        // so soft-skip cleanly) where unpackaged — libdwarf is AUR-only on Arch, libiberty ships inside
+        // binutils outside Debian.
+        libsodium: { install: [ { via: native  name: { apt: libsodium-dev  dnf: libsodium-devel  apk: libsodium-dev  zypper: libsodium-devel } } ] }
+        liburing:  { install: [ { via: native  name: { apt: liburing-dev   dnf: liburing-devel   apk: liburing-dev   zypper: liburing-devel } } ] }
+        libaio:    { install: [ { via: native  name: { apt: libaio-dev     dnf: libaio-devel     apk: libaio-dev     zypper: libaio-devel } } ] }
+        libunwind: { install: [ { via: native  name: { apt: libunwind-dev  dnf: libunwind-devel  apk: libunwind-dev  zypper: libunwind-devel } } ] }
+        libdwarf:  { install: [ { via: native  when: "debian or redhat or opensuse"  name: { apt: libdwarf-dev  dnf: libdwarf-devel  zypper: libdwarf-devel } } ] }
+        libiberty: { install: [ { via: native  when: "debian"  name: libiberty-dev } ] }
         libcurl:  { install: [ { via: native  name: { apt: libcurl4-openssl-dev  dnf: libcurl-devel  pacman: curl  apk: curl-dev  zypper: libcurl-devel } } ] }
         expat:    { install: [ { via: native  name: { apt: libexpat1-dev   dnf: expat-devel     pacman: expat  apk: expat-dev    zypper: libexpat-devel } } ] }
         gettext:  { install: [ { via: native  name: { apk: gettext-dev     zypper: gettext-tools } } ] }   // msgfmt/libintl for i18n
