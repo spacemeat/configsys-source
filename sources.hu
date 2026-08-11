@@ -471,8 +471,8 @@
             install: [
                 { via: source  repo: "https://github.com/facebook/folly"
                   version: { github: facebook/folly  strip-v: true }  tag-prefix: "v"
-                  requires: [ cxx, cmake, make, boost, openssl, libevent, fmt, fast_float, gflags, glog,
-                              double-conversion, zstd, lz4, snappy, bzip2 ]
+                  requires: [ cxx, cmake, make, boost, openssl, libevent, zlib, fmt, fast_float, gflags,
+                              glog, double-conversion, libzstd, liblz4, snappy, bzip2 ]
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) && cmake --install build" }
             ]
         }

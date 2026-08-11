@@ -34,6 +34,10 @@
         double-conversion: { install: [ { via: native  name: { apt: libdouble-conversion-dev  dnf: double-conversion-devel  apk: double-conversion-dev  zypper: double-conversion-devel } } ] }
         snappy:   { install: [ { via: native  name: { apt: libsnappy-dev   dnf: snappy-devel    apk: snappy-dev    zypper: snappy-devel } } ] }
         bzip2:    { install: [ { via: native  name: { apt: libbz2-dev      dnf: bzip2-devel     apk: bzip2-dev     zypper: libbz2-devel } } ] }
+        // zstd/lz4 DEV libraries — distinct from base's `zstd`/`lz4` (which are the CLI tools, in the
+        // `compression` bundle + required by ollama). folly links against these headers/libs.
+        libzstd:  { install: [ { via: native  name: { apt: libzstd-dev     dnf: libzstd-devel   pacman: zstd  apk: zstd-dev  zypper: libzstd-devel } } ] }
+        liblz4:   { install: [ { via: native  name: { apt: liblz4-dev      dnf: lz4-devel       pacman: lz4   apk: lz4-dev   zypper: liblz4-devel } } ] }
         libcurl:  { install: [ { via: native  name: { apt: libcurl4-openssl-dev  dnf: libcurl-devel  pacman: curl  apk: curl-dev  zypper: libcurl-devel } } ] }
         expat:    { install: [ { via: native  name: { apt: libexpat1-dev   dnf: expat-devel     pacman: expat  apk: expat-dev    zypper: libexpat-devel } } ] }
         gettext:  { install: [ { via: native  name: { apk: gettext-dev     zypper: gettext-tools } } ] }   // msgfmt/libintl for i18n
