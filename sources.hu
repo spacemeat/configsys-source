@@ -451,6 +451,7 @@
         // fast_float: header-only (folly REQUIREs it; it's spottily packaged, so source is the safe
         // route). `-DFASTFLOAT_INSTALL=ON` installs the headers + a CMake config package.
         fast_float: {
+            description: "fast_float — header-only C++ library for very fast string->number (from_chars) parsing."
             install: [
                 { via: source  repo: "https://github.com/fastfloat/fast_float"
                   version: { github: fastfloat/fast_float  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
