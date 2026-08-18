@@ -381,21 +381,44 @@
         // release appears.
 
         // ----- C++ / CMake libraries (NEW components — source-only) -----------------------------
-        // Fast DDS (eProsima) — DDS/RTPS middleware (the default ROS 2 RMW). NOT in any distro
-        // repo, so `source` is its ONLY install method: it builds by default (correct — there is no
-        // binary alternative to lose a default to). A standalone CMake build with -DTHIRDPARTY=ON
-        // compiles + bundles its own deps (Fast-CDR, foonathan_memory, TinyXML2), so no separate
-        // dependency components are needed; OpenSSL provides the DDS security transport. NOTE: the
-        // libraries install under $PREFIX/lib (~/.local/lib for a user build) — put that on your
-        // loader path (LD_LIBRARY_PATH, or ldconfig for a system prefix) to link/run against them.
-        // [UNVERIFIED: transcribed from eProsima's CMake-install docs, not container-built.]
+        // Fast DDS (eProsima) — DDS/RTPS middleware (the default ROS 2 RMW). NOT in any distro repo,
+        // so `source` is its ONLY install method (it builds by default — no binary alternative to
+        // lose a default to). eProsima's standalone CMake install builds THREE things in order to a
+        // shared prefix: foonathan_memory_vendor -> Fast-CDR -> Fast-DDS. Fast DDS does NOT bundle
+        // those (the old -DTHIRDPARTY approach only ever covered Asio/TinyXML2 as git submodules,
+        // which a plain clone doesn't fetch — hence the earlier build failure). So we model the two
+        // eProsima libs as their own `source` components (built first via `requires:`, dependency
+        // order guarantees it), and Asio + TinyXML2 + OpenSSL as native system libs (tools.hu). The
+        // Fast-DDS build gets -DCMAKE_PREFIX_PATH=$PREFIX so find_package() locates the two libs we
+        // built into ~/.local. NOTE: everything lands under $PREFIX/lib (~/.local/lib for a user
+        // build) — put that on your loader path (LD_LIBRARY_PATH, or ldconfig for a system prefix)
+        // to link/run against them. [VERIFIED: the full foonathan_memory_vendor -> Fast-CDR ->
+        // Fast-DDS chain builds + installs on fedora:41 via test/run-source-builds-in-podman.sh.]
+        foonathan-memory: {
+            description: "foonathan_memory (eProsima vendor build) — STL-compatible C++ memory allocators; a Fast DDS build dependency."
+            install: [
+                { via: source  repo: "https://github.com/eProsima/foonathan_memory_vendor"
+                  version: { github: eProsima/foonathan_memory_vendor  strip-v: true }  tag-prefix: "v"
+                  requires: [ cxx, cmake ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) --target install" }
+            ]
+        }
+        fastcdr: {
+            description: "eProsima Fast CDR — a C++ library for RTPS-standard CDR serialization; a Fast DDS build dependency (also usable standalone)."
+            install: [
+                { via: source  repo: "https://github.com/eProsima/Fast-CDR"
+                  version: { github: eProsima/Fast-CDR  strip-v: true }  tag-prefix: "v"
+                  requires: [ cxx, cmake ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) --target install" }
+            ]
+        }
         fastdds: {
             description: "eProsima Fast DDS — DDS/RTPS middleware (the default ROS 2 RMW)."
             install: [
                 { via: source  repo: "https://github.com/eProsima/Fast-DDS"
                   version: { github: eProsima/Fast-DDS  strip-v: true }  tag-prefix: "v"
-                  requires: [ cxx, cmake, openssl ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF . && cmake --build build -j$(nproc) --target install" }
+                  requires: [ cxx, cmake, openssl, asio, tinyxml2, fastcdr, foonathan-memory ]
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_PREFIX_PATH=$PREFIX -DBUILD_SHARED_LIBS=ON -DCOMPILE_EXAMPLES=OFF -DBUILD_TESTING=OFF . && cmake --build build -j$(nproc) --target install" }
             ]
         }
         // EASTL (Electronic Arts) — an STL-alternative C++ template library. Only Arch (AUR) packages

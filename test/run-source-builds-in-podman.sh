@@ -49,6 +49,11 @@ rows=(
 'whois|fedora:41|dnf install -y -q gcc make perl libidn2-devel gettext git|make && make install prefix=/root/.local && test -x /root/.local/bin/whois && echo whois-built'
 'cmake|fedora:41|dnf install -y -q gcc gcc-c++ make git|./bootstrap --prefix=/root/.local --parallel=$(nproc) && make -j$(nproc) && make install && /root/.local/bin/cmake --version | head -1'
 'ffmpeg|fedora:41|dnf install -y -q gcc make nasm git|./configure --prefix=/root/.local --disable-doc --enable-gpl && make -j$(nproc) && make install && /root/.local/bin/ffmpeg -version | head -1'
+# fastdds needs its two eProsima libs (foonathan_memory_vendor, Fast-CDR) built into the SAME prefix
+# FIRST, then Fast-DDS with -DCMAKE_PREFIX_PATH so find_package locates them — the multi-repo chain
+# configsys models via `requires:`. Here the build clones the two deps itself (the harness only clones
+# the component's own repo). Asio/TinyXML2/OpenSSL come from the distro (asio-devel etc.).
+'fastdds|fedora:41|dnf install -y -q gcc-c++ cmake make git asio-devel tinyxml2-devel openssl-devel|git clone --depth 1 https://github.com/eProsima/foonathan_memory_vendor /fm && cmake -S /fm -B /fm/b -DCMAKE_INSTALL_PREFIX=/root/.local -DBUILD_SHARED_LIBS=ON && cmake --build /fm/b -j$(nproc) --target install && git clone --depth 1 https://github.com/eProsima/Fast-CDR /fc && cmake -S /fc -B /fc/b -DCMAKE_INSTALL_PREFIX=/root/.local -DBUILD_SHARED_LIBS=ON && cmake --build /fc/b -j$(nproc) --target install && cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local -DCMAKE_PREFIX_PATH=/root/.local -DBUILD_SHARED_LIBS=ON -DCOMPILE_EXAMPLES=OFF -DBUILD_TESTING=OFF . && cmake --build build -j$(nproc) --target install && ls /root/.local/lib/libfastdds.so* /root/.local/lib/libfastrtps.so* 2>/dev/null | head -1 && echo fastdds-built'
 # NOTE: git and nmap are source-buildable and verified out-of-band, but are NOT gated here.
 # Both trip a rootless-podman user-namespace quirk where `tar` cannot chmod certain archived
 # dirs as container-root (git's install-time template tree; nmap's bundled `zenmap` dir on
@@ -74,6 +79,7 @@ declare -A repo=(
   [ninja]=https://github.com/ninja-build/ninja [protobuf]=https://github.com/protocolbuffers/protobuf
   [whois]=https://github.com/rfc1036/whois
   [cmake]=https://github.com/Kitware/CMake [ffmpeg]=https://github.com/FFmpeg/FFmpeg
+  [fastdds]=https://github.com/eProsima/Fast-DDS
 )
 
 fail=0

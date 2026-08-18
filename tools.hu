@@ -36,6 +36,14 @@
                     install: [ { via: native  name: { apt: libssl-dev      dnf: openssl-devel   apk: openssl-dev   zypper: libopenssl-devel } } ] }
         zlib:     { description: "zlib — the DEFLATE compression library (dev headers + libs)."
                     install: [ { via: native  name: { apt: zlib1g-dev      dnf: zlib-devel      apk: zlib-dev      zypper: zlib-devel } } ] }
+        // Fast DDS build deps: Asio (async I/O) + TinyXML-2 (XML config parsing) must be present as
+        // system libs — Fast DDS does NOT bundle them (foonathan_memory + Fast-CDR are built from
+        // source, see sources.hu). pacman's `asio`/`tinyxml2` match the component name (default).
+        // [name sweep pending for dnf/zypper/apk — the apt names are the eProsima-documented ones.]
+        asio:     { description: "Asio — cross-platform C++ async I/O + networking library (header library; dev package)."
+                    install: [ { via: native  name: { apt: libasio-dev     dnf: asio-devel      apk: asio-dev      zypper: asio-devel } } ] }
+        tinyxml2: { description: "TinyXML-2 — a small, efficient C++ XML parser (dev headers + lib)."
+                    install: [ { via: native  name: { apt: libtinyxml2-dev dnf: tinyxml2-devel  apk: tinyxml2-dev  zypper: libtinyxml2-devel } } ] }
         // C++ dev-libs for folly (also have `source` alternatives in sources.hu). Arch names verified
         // (glog = google-glog there); apt/dnf/apk/zypper are the standard lib*-dev / *-devel forms —
         // confirm with a name sweep as repos roll. `default` (component name) covers pacman where it
