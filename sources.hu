@@ -429,11 +429,16 @@
         // extension. Installs `xpilot-ng-sdl` (client) + `xpilot-ng-server` under $PREFIX/bin. Press
         // "Internet" in the client to pull the live server list from the metaserver (meta.xpilot.org).
         // [VERIFIED: master builds + installs on ubuntu:24.04 via the podman source-build harness.]
+        // `suggests: gcc-14` (SOFT): master needs a modern GCC (>=~13; an old Debian/Ubuntu default
+        // like gcc-11 on 22.04 fails to build it). On debian this installs gcc-14 via the toolchain
+        // PPA; on Fedora/Arch (already GCC 14/15) the suggest simply doesn't resolve and is skipped.
+        // The build then compiles with the newest gcc on PATH (gcc-14 if present, else the default).
         xpilot: { description: "XPilot NG — the classic multiplayer 2D space-combat game (SDL client + server)."
+            suggests: gcc-14
             install: [
                 { via: source  repo: "https://github.com/kekyo/xpilot-ng"  ref: master
                   requires: [ cc, make, autoconf, automake, libtool, pkg-config, expat, zlib, sdl, sdl2-ttf, sdl2-image, opengl ]
-                  build: "( ./bootstrap || autoreconf -fi ) && ./configure --prefix=$PREFIX --disable-x11-client --disable-xp-mapedit --disable-replay && make -j$(nproc) && make install"
+                  build: 'export CC="$(command -v gcc-14 || command -v gcc-13 || command -v gcc)"; export CXX="$(command -v g++-14 || command -v g++-13 || command -v g++)"; ( ./bootstrap || autoreconf -fi ) && ./configure --prefix=$PREFIX --disable-x11-client --disable-xp-mapedit --disable-replay && make -j$(nproc) && make install'
                   uninstall-cmd: "make uninstall" }
             ]
         }
