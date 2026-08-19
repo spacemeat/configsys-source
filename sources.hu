@@ -421,6 +421,22 @@
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_PREFIX_PATH=$PREFIX -DBUILD_SHARED_LIBS=ON -DCOMPILE_EXAMPLES=OFF -DBUILD_TESTING=OFF . && cmake --build build -j$(nproc) --target install" }
             ]
         }
+        // XPilot NG — the classic 1990s multiplayer 2D space-combat game. No distro packages it
+        // anymore (dead since ~2010), but the fork github.com/kekyo/xpilot-ng is alive again and its
+        // `master` modernized the build to SDL2 + OpenGL 3.3 and fixed GCC 14/15 — so `source` is the
+        // only method and it builds by default. We build the SDL client + server and DISABLE the
+        // legacy X11 clients (x11-client/mapedit/replay), which need the removed Xxf86misc X.org
+        // extension. Installs `xpilot-ng-sdl` (client) + `xpilot-ng-server` under $PREFIX/bin. Press
+        // "Internet" in the client to pull the live server list from the metaserver (meta.xpilot.org).
+        // [VERIFIED: master builds + installs on ubuntu:24.04 via the podman source-build harness.]
+        xpilot: { description: "XPilot NG — the classic multiplayer 2D space-combat game (SDL client + server)."
+            install: [
+                { via: source  repo: "https://github.com/kekyo/xpilot-ng"  ref: master
+                  requires: [ cc, make, autoconf, automake, libtool, pkg-config, expat, zlib, sdl, sdl2-ttf, sdl2-image, opengl ]
+                  build: "( ./bootstrap || autoreconf -fi ) && ./configure --prefix=$PREFIX --disable-x11-client --disable-xp-mapedit --disable-replay && make -j$(nproc) && make install"
+                  uninstall-cmd: "make uninstall" }
+            ]
+        }
         // EASTL (Electronic Arts) — an STL-alternative C++ template library. Only Arch (AUR) packages
         // it, so `source` is the install method on every other distro (it's the sole method there, so
         // it builds by default — correct, there's no binary alternative to lose a default to; on Arch

@@ -87,6 +87,11 @@
                     install: [ { via: native  name: { apt: libcurl4-openssl-dev  dnf: libcurl-devel  pacman: curl  apk: curl-dev  zypper: libcurl-devel } } ] }
         expat:    { description: "Expat — a fast stream-oriented XML parser library (dev headers + libs)."
                     install: [ { via: native  name: { apt: libexpat1-dev   dnf: expat-devel     pacman: expat  apk: expat-dev    zypper: libexpat-devel } } ] }
+        // SDL2 add-on dev libs (core `sdl` is SDL2 proper). Used by the xpilot source recipe.
+        sdl2-ttf:   { description: "SDL2_ttf — TrueType font rendering for SDL2 (dev headers + libs)."
+                      install: [ { via: native  name: { apt: libsdl2-ttf-dev    dnf: SDL2_ttf-devel    pacman: sdl2_ttf    apk: sdl2_ttf-dev    zypper: libSDL2_ttf-devel } } ] }
+        sdl2-image: { description: "SDL2_image — image-file loading for SDL2 (dev headers + libs)."
+                      install: [ { via: native  name: { apt: libsdl2-image-dev  dnf: SDL2_image-devel  pacman: sdl2_image  apk: sdl2_image-dev  zypper: libSDL2_image-devel } } ] }
         gettext:  { description: "GNU gettext — internationalization message tools (msgfmt) and the libintl runtime."
                     install: [ { via: native  name: { apk: gettext-dev     zypper: gettext-tools } } ] }
         libpcap:  { description: "libpcap — the packet-capture library (nethogs needs it)."
