@@ -394,7 +394,7 @@
         // build) — put that on your loader path (LD_LIBRARY_PATH, or ldconfig for a system prefix)
         // to link/run against them. [VERIFIED: the full foonathan_memory_vendor -> Fast-CDR ->
         // Fast-DDS chain builds + installs on fedora:41 via test/run-source-builds-in-podman.sh.]
-        foonathan-memory: {
+        foonathan-memory: { attrs: [ lib FOSS permissive ]
             description: "foonathan_memory (eProsima vendor build) — STL-compatible C++ memory allocators; a Fast DDS build dependency."
             install: [
                 { via: source  repo: "https://github.com/eProsima/foonathan_memory_vendor"
@@ -403,7 +403,7 @@
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) --target install" }
             ]
         }
-        fastcdr: {
+        fastcdr: { attrs: [ lib FOSS permissive ]
             description: "eProsima Fast CDR — a C++ library for RTPS-standard CDR serialization; a Fast DDS build dependency (also usable standalone)."
             install: [
                 { via: source  repo: "https://github.com/eProsima/Fast-CDR"
@@ -412,7 +412,7 @@
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) --target install" }
             ]
         }
-        fastdds: {
+        fastdds: { attrs: [ lib FOSS permissive ]
             description: "eProsima Fast DDS — DDS/RTPS middleware (the default ROS 2 RMW)."
             install: [
                 { via: source  repo: "https://github.com/eProsima/Fast-DDS"
@@ -433,7 +433,7 @@
         // like gcc-11 on 22.04 fails to build it). On debian this installs gcc-14 via the toolchain
         // PPA; on Fedora/Arch (already GCC 14/15) the suggest simply doesn't resolve and is skipped.
         // The build then compiles with the newest gcc on PATH (gcc-14 if present, else the default).
-        xpilot: { description: "XPilot NG — the classic multiplayer 2D space-combat game (SDL client + server)."
+        xpilot: { attrs: [ game app FOSS copyleft ] description: "XPilot NG — the classic multiplayer 2D space-combat game (SDL client + server)."
             suggests: gcc-14
             install: [
                 { via: source  repo: "https://github.com/kekyo/xpilot-ng"  ref: master
@@ -463,14 +463,14 @@
         // install target; built SHARED to match the distro packages. [UNVERIFIED: transcribed from
         // each project's CMake, not container-built.]
         // fmt: bare-version tags (12.2.0). Header+lib formatting library.
-        fmt: {
+        fmt: { attrs: [ lib FOSS permissive ]
             install: [
                 { via: source  repo: "https://github.com/fmtlib/fmt"
                   version: { github: fmtlib/fmt }  requires: [ cxx, cmake, make ]
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DFMT_TEST=OFF -DFMT_DOC=OFF && cmake --build build -j$(nproc) && cmake --install build" }
             ]
         }
-        gflags: {
+        gflags: { attrs: [ lib FOSS permissive ]
             install: [
                 { via: source  repo: "https://github.com/gflags/gflags"
                   version: { github: gflags/gflags  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
@@ -478,14 +478,14 @@
             ]
         }
         // glog: auto-detects gflags if present (folly pulls both). Tests off.
-        glog: {
+        glog: { attrs: [ lib FOSS permissive ]
             install: [
                 { via: source  repo: "https://github.com/google/glog"
                   version: { github: google/glog  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
                   build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DWITH_GTEST=OFF -DBUILD_TESTING=OFF && cmake --build build -j$(nproc) && cmake --install build" }
             ]
         }
-        double-conversion: {
+        double-conversion: { attrs: [ lib FOSS permissive ]
             install: [
                 { via: source  repo: "https://github.com/google/double-conversion"
                   version: { github: google/double-conversion  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
@@ -494,7 +494,7 @@
         }
         // fast_float: header-only (folly REQUIREs it; it's spottily packaged, so source is the safe
         // route). `-DFASTFLOAT_INSTALL=ON` installs the headers + a CMake config package.
-        fast_float: {
+        fast_float: { attrs: [ lib FOSS permissive ]
             description: "fast_float — header-only C++ library for very fast string->number (from_chars) parsing."
             install: [
                 { via: source  repo: "https://github.com/fastfloat/fast_float"
