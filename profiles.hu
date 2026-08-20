@@ -15,5 +15,6 @@
         // folly is only buildable via this plugin's `source` recipe, so its home in `dev` lives
         // here too — the capability and its profile placement arrive (and leave) together.
         dev: [ +dev  folly ]
+        science: [ +science  fastdds ]
     }
 }

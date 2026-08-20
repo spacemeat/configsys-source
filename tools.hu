@@ -7,24 +7,10 @@
     // ninja/meson/go/zig; this file fills the autotools + dev-lib gaps.
     components: {
 
-        // --- build tools (component name is the apt/zypper name; override the others) ---
-        // pkg-config: Fedora ships the shim as pkgconf-pkg-config; Arch/Alpine call it pkgconf.
-        pkg-config: { attrs: [ CLI FOSS copyleft ] description: "pkg-config — query installed libraries' compile and link flags at build time."
-                      install: [ { via: native  name: { dnf: pkgconf-pkg-config  pacman: pkgconf  apk: pkgconf } } ] }
-        autoconf:   { attrs: [ CLI toolchain FOSS GNU copyleft ] description: "GNU Autoconf — generate a package's `configure` script from autotools macros."
-                      install: [ { via: native } ] }   // same name on every manager
-        automake:   { attrs: [ CLI toolchain FOSS GNU copyleft ] description: "GNU Automake — generate a portable Makefile.in from Makefile.am (autotools)."
-                      install: [ { via: native } ] }
-        libtool:    { attrs: [ CLI lib FOSS GNU copyleft ] description: "GNU Libtool — portable shared-library build/link wrapper (autotools)."
-                      install: [ { via: native } ] }
-        bison:      { attrs: [ CLI toolchain FOSS GNU copyleft ] description: "GNU Bison — the yacc-compatible parser generator (tmux's grammar needs it)."
-                      install: [ { via: native } ] }
-        flex:       { attrs: [ CLI toolchain FOSS permissive ] description: "flex — the fast lexical-analyzer (lexer) generator (jq's regenerated parser needs it)."
-                      install: [ { via: native } ] }
-        perl:       { attrs: [ CLI runtime FOSS copyleft ] description: "Perl — the interpreter git's default build uses for its build tooling."
-                      install: [ { via: native } ] }
-        nasm:       { attrs: [ CLI toolchain FOSS permissive ] description: "NASM — the Netwide x86/x86-64 assembler (ffmpeg needs it); same name everywhere."
-                      install: [ { via: native } ] }
+        // NOTE: the autotools/GNU C build tools (pkg-config, autoconf, automake, libtool, bison,
+        // flex) plus perl and nasm now live in BASE routes.hu (under the `autotools` profile) — they
+        // are basic C-dev tools, not source-build recipes. The recipes below `requires:` them by
+        // name and resolve them from base. Only the dev LIBRARIES specific to these recipes stay here.
 
         // --- dev libraries (headers + libs). Debian/Fedora/openSUSE split a -dev/-devel package;
         // Arch (and the component-name default) don't split, so the base name carries headers. ---
