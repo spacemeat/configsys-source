@@ -35,7 +35,7 @@ rows=(
 'bazelisk|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o bazelisk . && install -Dm755 bazelisk /root/.local/bin/bazelisk && test -x /root/.local/bin/bazelisk && echo built'
 'grpcurl|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -o grpcurl ./cmd/grpcurl && install -Dm755 grpcurl /root/.local/bin/grpcurl && /root/.local/bin/grpcurl --version'
 'nushell|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release --bin nu && install -Dm755 target/release/nu /root/.local/bin/nu && /root/.local/bin/nu --version'
-'yazi|archlinux:latest|pacman -Sy --noconfirm --needed rust git|cargo build --release --locked && install -Dm755 target/release/yazi /root/.local/bin/yazi && install -Dm755 target/release/ya /root/.local/bin/ya && /root/.local/bin/yazi --version'
+'yazi|archlinux:latest|pacman -Syu --noconfirm --needed base-devel rust git|cargo build --release --locked && install -Dm755 target/release/yazi /root/.local/bin/yazi && install -Dm755 target/release/ya /root/.local/bin/ya && /root/.local/bin/yazi --version'
 'mtr|fedora:41|dnf install -y -q gcc make autoconf automake pkgconf-pkg-config ncurses-devel git|./bootstrap.sh && ./configure --prefix=/root/.local --sbindir=/root/.local/bin --without-gtk && make && make install && /root/.local/bin/mtr --version'
 'curl|fedora:41|dnf install -y -q gcc make autoconf automake libtool pkgconf-pkg-config openssl-devel zlib-devel git|autoreconf -fi && ./configure --prefix=/root/.local --with-openssl --with-zlib --without-libpsl && make && make install && /root/.local/bin/curl --version'
 'helm|archlinux:latest|pacman -Sy --noconfirm --needed go git|CGO_ENABLED=0 go build -trimpath -o helm ./cmd/helm && install -Dm755 helm /root/.local/bin/helm && /root/.local/bin/helm version'
@@ -47,7 +47,7 @@ rows=(
 'ninja|fedora:41|dnf install -y -q gcc-c++ cmake make git|cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local -DCMAKE_BUILD_TYPE=Release && cmake --build build && cmake --install build && /root/.local/bin/ninja --version'
 'protobuf|fedora:41|dnf install -y -q gcc-c++ cmake make git|git submodule update --init --recursive && cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module && cmake --build build && cmake --install build && /root/.local/bin/protoc --version'
 'whois|fedora:41|dnf install -y -q gcc make perl libidn2-devel gettext git|make && make install prefix=/root/.local && test -x /root/.local/bin/whois && echo whois-built'
-'cmake|fedora:41|dnf install -y -q gcc gcc-c++ make git|./bootstrap --prefix=/root/.local --parallel=$(nproc) && make -j$(nproc) && make install && /root/.local/bin/cmake --version | head -1'
+'cmake|fedora:41|dnf install -y -q gcc gcc-c++ make git openssl-devel|./bootstrap --prefix=/root/.local --parallel=$(nproc) && make -j$(nproc) && make install && /root/.local/bin/cmake --version | head -1'
 'ffmpeg|fedora:41|dnf install -y -q gcc make nasm git|./configure --prefix=/root/.local --disable-doc --enable-gpl && make -j$(nproc) && make install && /root/.local/bin/ffmpeg -version | head -1'
 # fastdds needs its two eProsima libs (foonathan_memory_vendor, Fast-CDR) built into the SAME prefix
 # FIRST, then Fast-DDS with -DCMAKE_PREFIX_PATH so find_package locates them — the multi-repo chain
@@ -113,15 +113,27 @@ declare -A repo=(
   [fff]=https://github.com/dylanaraps/fff
 )
 
+# For projects whose default branch diverges from the release the RECIPE installs, build the latest
+# vX.Y.Z tag instead of master (matching `version: {github}`): protobuf's master is mid-refactor and
+# won't compile; yazi's default tag is a rolling `nightly`. Resolved host-side (needs git + network).
+declare -A ref=(
+  [protobuf]=latest [yazi]=latest [cmake]=latest
+)
+
 fail=0
 for row in "${rows[@]}"; do
   IFS='|' read -r name img deps build <<<"$row"
   [ -n "$want" ] && [[ ",$want," != *",$name,"* ]] && continue
   echo ">> building $name on $img"
+  branchopt=""
+  if [ "${ref[$name]:-}" = latest ]; then
+    tag=$(git ls-remote --tags --sort=-v:refname "${repo[$name]}" 2>/dev/null | grep -oE 'refs/tags/v[0-9.]+$' | head -1 | sed 's#refs/tags/##')
+    [ -n "$tag" ] && branchopt="--branch $tag"
+  fi
   out=$("$RT" run --rm "$img" bash -c "
     set -e; export DEBIAN_FRONTEND=noninteractive
     $deps >/dev/null 2>&1
-    git clone --depth 1 ${repo[$name]} /s >/dev/null 2>&1; cd /s
+    git clone --depth 1 $branchopt ${repo[$name]} /s >/dev/null 2>&1; cd /s
     $build" 2>&1)
   rc=$?
   if [ $rc -eq 0 ]; then echo "   OK: $(echo "$out" | tail -1)"; else
