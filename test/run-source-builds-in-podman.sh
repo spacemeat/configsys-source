@@ -97,6 +97,13 @@ declare -A repo=(
   [cmake]=https://github.com/Kitware/CMake [ffmpeg]=https://github.com/FFmpeg/FFmpeg
   [fastdds]=https://github.com/eProsima/Fast-DDS
   [xpilot]=https://github.com/kekyo/xpilot-ng
+  [dwm]=https://git.suckless.org/dwm [st]=https://git.suckless.org/st
+  [dmenu]=https://git.suckless.org/dmenu
+  [dwmblocks]=https://github.com/torrinfail/dwmblocks
+  [dwmblocks-async]=https://github.com/UtkarshVerma/dwmblocks-async
+  [dwl]=https://codeberg.org/dwl/dwl [somebar]=https://git.sr.ht/~raphi/somebar
+  [someblocks]=https://git.sr.ht/~raphi/someblocks
+  [fff]=https://github.com/dylanaraps/fff
 )
 
 fail=0

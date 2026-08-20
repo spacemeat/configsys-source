@@ -12,9 +12,9 @@
     // `+self` term hooks the right base; a name with no lower definition just becomes a fresh
     // profile this plugin owns.
     profiles: {
-        // folly is only buildable via this plugin's `source` recipe, so its home in `dev` lives
+        // folly is only buildable via this plugin's `source` recipe, so its home in `c-cpp-libs` lives
         // here too — the capability and its profile placement arrive (and leave) together.
-        dev: [ +dev  folly ]
+        c-cpp-libs: [ folly ]
         science: [ +science  fastdds ]
     }
 }
