@@ -20,26 +20,37 @@
             install: [ { via: source  repo: "https://git.suckless.org/dmenu"  requires: [ libx11, libxinerama, libxft ]
                          build: "make PREFIX=$PREFIX clean install" } ] }
         // dwmblocks + dwmblocks-async both build the `dwmblocks` binary -> install ONE (alternatives).
+        // dwmblocks (torrinfail, unmaintained) passes a `void(*)(void)` handler to signal(), which
+        // GCC 14 rejects as a hard error — inject `-Wno-error=incompatible-pointer-types` via CC to
+        // keep it a warning (its Makefile uses neither CPPFLAGS nor a settable CFLAGS on that line).
         dwmblocks: { attrs: [ CLI FOSS permissive ] description: "dwmblocks — a modular status-bar feeder for dwm (blocks defined in config.h)."
             install: [ { via: source  repo: "https://github.com/torrinfail/dwmblocks"  requires: [ libx11 ]
-                         build: "make PREFIX=$PREFIX install" } ] }
+                         build: "make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX install" } ] }
+        // dwmblocks-async links `xcb-atom` via pkg-config but not base libxcb, so its raw xcb_* calls
+        // are undefined at link — add `xcb` to LIBS (pkg-config then emits -lxcb). Uses xcb, not Xlib.
         dwmblocks-async: { attrs: [ CLI FOSS permissive ] description: "dwmblocks-async — an asynchronous rewrite of dwmblocks (concurrent status blocks)."
-            install: [ { via: source  repo: "https://github.com/UtkarshVerma/dwmblocks-async"  requires: [ libx11 ]
-                         build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://github.com/UtkarshVerma/dwmblocks-async"  requires: [ libxcb, xcb-util ]
+                         build: "make LIBS='xcb-atom xcb' PREFIX=$PREFIX install" } ] }
 
-        // --- dwl / Wayland (wlroots). dwl pins a wlroots MINOR per release; on a wlroots-mismatch
-        // build failure, pin the `wlroots` package or check out a matching dwl `ref:`. ---
+        // --- dwl / Wayland (wlroots). dwl locks to ONE wlroots MINOR (its Makefile pkg-configs a
+        // specific `wlroots-0.XX`); a rolling distro whose wlroots has moved on WILL fail the build.
+        // [KNOWN: dwl master needs wlroots 0.19, but Arch already ships only wlroots0.20 -> it does
+        // NOT build there right now. Check out a dwl `ref:` matching your distro's wlroots, or pin
+        // the `wlroots` package to the version dwl wants.] Not in the podman gate for this reason. ---
         dwl: { attrs: [ GUI FOSS copyleft ] description: "dwl — a dwm-like Wayland compositor built on wlroots (config.h-compiled)."
             install: [ { via: source  repo: "https://codeberg.org/dwl/dwl"
                          requires: [ wlroots, wayland, wayland-protocols, libinput, libxkbcommon, pixman, pkg-config ]
-                         build: "make PREFIX=$PREFIX install" } ] }
+                         build: "cp config.def.h config.h && make PREFIX=$PREFIX install" } ] }
+        // somebar's meson build needs config.hpp created from config.def.hpp first (no auto-copy).
         somebar: { attrs: [ GUI FOSS permissive ] description: "somebar — a dwm-like status/tag bar for dwl (config.hpp-compiled, meson build)."
             install: [ { via: source  repo: "https://git.sr.ht/~raphi/somebar"
                          requires: [ wayland, wayland-protocols, cairo, pango, meson, ninja, pkg-config ]
-                         build: "meson setup --prefix=$PREFIX build && ninja -C build install" } ] }
+                         build: "cp src/config.def.hpp src/config.hpp && meson setup --prefix=$PREFIX build && ninja -C build install" } ] }
+        // someblocks has the same GCC-14 signal()-handler error as dwmblocks (its Makefile uses only
+        // LDFLAGS on the compile line, so inject the downgrade via CC).
         someblocks: { attrs: [ CLI FOSS permissive ] description: "someblocks — a dwmblocks-style status feeder for somebar (config.h-compiled)."
             install: [ { via: source  repo: "https://git.sr.ht/~raphi/someblocks"
-                         build: "make PREFIX=$PREFIX install" } ] }
+                         build: "make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX install" } ] }
 
         // fff (defined in core: native on Debian + AUR on Arch) — ADD a source method so it builds on
         // Fedora/openSUSE/Alpine/EL too. Pure Bash: the Makefile installs the script into $PREFIX/bin.

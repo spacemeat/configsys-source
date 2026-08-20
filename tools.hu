@@ -109,10 +109,12 @@
                              install: [ { via: native  name: { apt: libwayland-dev  dnf: wayland-devel  apk: wayland-dev  zypper: wayland-devel  default: wayland } } ] }
         wayland-protocols: { attrs: [ lib FOSS permissive ] description: "wayland-protocols — the standard Wayland protocol XML definitions."
                              install: [ { via: native  name: { apt: wayland-protocols  dnf: wayland-protocols-devel  apk: wayland-protocols  zypper: wayland-protocols-devel  default: wayland-protocols } } ] }
-        // wlroots: dwl pins a specific wlroots MINOR per release (dwl 0.8 -> wlroots 0.19); a
-        // mismatched system wlroots fails the build. Pin the package / check out a matching dwl ref.
+        // wlroots: dwl pins a specific wlroots MINOR per release, and distros VERSION the package
+        // (Arch has no bare `wlroots` — it ships `wlroots0.20`, previously `wlroots0.19`). Bump the
+        // pacman name as Arch rolls, and match it to the wlroots your dwl `ref:` wants, or the build
+        // fails (dwl master currently needs 0.19 while Arch is on 0.20 — a known mismatch).
         wlroots:           { attrs: [ lib FOSS permissive ] description: "wlroots — the modular Wayland compositor library (dev headers + libs)."
-                             install: [ { via: native  name: { apt: libwlroots-dev  dnf: wlroots-devel  apk: wlroots-dev  zypper: wlroots-devel  default: wlroots } } ] }
+                             install: [ { via: native  name: { apt: libwlroots-dev  dnf: wlroots-devel  apk: wlroots-dev  zypper: wlroots-devel  pacman: wlroots0.20 } } ] }
         libinput:          { attrs: [ lib FOSS permissive ] description: "libinput — the input-device handling library for Wayland/X (dev headers + libs)."
                              install: [ { via: native  name: { apt: libinput-dev  dnf: libinput-devel  apk: libinput-dev  zypper: libinput-devel  default: libinput } } ] }
         libxkbcommon:      { attrs: [ lib FOSS permissive ] description: "libxkbcommon — the keyboard keymap handling library (dev headers + libs)."
@@ -123,5 +125,11 @@
                              install: [ { via: native  name: { apt: libcairo2-dev  dnf: cairo-devel  apk: cairo-dev  zypper: cairo-devel  default: cairo } } ] }
         pango:             { attrs: [ lib FOSS copyleft ] description: "Pango — the text-layout and font-rendering library (dev headers + libs)."
                              install: [ { via: native  name: { apt: libpango1.0-dev  dnf: pango-devel  apk: pango-dev  zypper: pango-devel  default: pango } } ] }
+        // XCB (for dwmblocks-async). xcb-util provides the `xcb-atom` pkg-config it links (Arch name
+        // verified; other managers' -util names are best-effort — confirm with a name sweep).
+        libxcb:            { attrs: [ lib FOSS permissive ] description: "libxcb — the X protocol C-language Binding (XCB) library (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libxcb1-dev  dnf: libxcb-devel  apk: libxcb-dev  zypper: libxcb-devel  default: libxcb } } ] }
+        xcb-util:          { attrs: [ lib FOSS permissive ] description: "xcb-util — XCB utility libraries (atom/aux/event helpers; dev headers + libs)."
+                             install: [ { via: native  name: { apt: libxcb-util-dev  dnf: xcb-util-devel  apk: xcb-util-dev  zypper: xcb-util-devel  default: xcb-util } } ] }
     }
 }

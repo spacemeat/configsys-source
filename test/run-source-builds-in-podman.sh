@@ -70,12 +70,19 @@ rows=(
 'dwm|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 libxinerama libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/dwm && echo dwm-built'
 'st|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/st && echo st-built'
 'dmenu|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 libxinerama libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/dmenu && echo dmenu-built'
-'dwmblocks|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 git|make PREFIX=/root/.local install && test -x /root/.local/bin/dwmblocks && echo dwmblocks-built'
-'dwmblocks-async|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 git|make PREFIX=/root/.local install && test -x /root/.local/bin/dwmblocks && echo dwmblocks-async-built'
-'dwl|archlinux:latest|pacman -Sy --noconfirm --needed base-devel wlroots wayland wayland-protocols libinput libxkbcommon pixman pkgconf git|make PREFIX=/root/.local install && test -x /root/.local/bin/dwl && echo dwl-built'
-'somebar|archlinux:latest|pacman -Sy --noconfirm --needed base-devel wayland wayland-protocols cairo pango meson ninja pkgconf git|meson setup --prefix=/root/.local build && ninja -C build install && test -x /root/.local/bin/somebar && echo somebar-built'
-'someblocks|archlinux:latest|pacman -Sy --noconfirm --needed base-devel git|make PREFIX=/root/.local install && test -x /root/.local/bin/someblocks && echo someblocks-built'
-'fff|archlinux:latest|pacman -Sy --noconfirm --needed base-devel git|make PREFIX=/root/.local install && test -x /root/.local/bin/fff && echo fff-built'
+# NOTE: -Syu (full upgrade, not -Sy) on Arch — a partial upgrade pulls a newer python (meson's
+# runtime) against the image's older glibc and breaks meson. dwmblocks/someblocks need a GCC-14
+# pointer-error downgrade via CC; dwmblocks-async needs xcb added to LIBS; somebar needs config.hpp
+# copied first. dwl is NOT gated here: it locks to one wlroots minor and Arch's rolling wlroots
+# (0.20) no longer matches dwl master (0.19) — it can't build on Arch until they realign.
+'dwm|archlinux:latest|pacman -Syu --noconfirm --needed base-devel libx11 libxinerama libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/dwm && echo dwm-built'
+'st|archlinux:latest|pacman -Syu --noconfirm --needed base-devel libx11 libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/st && echo st-built'
+'dmenu|archlinux:latest|pacman -Syu --noconfirm --needed base-devel libx11 libxinerama libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/dmenu && echo dmenu-built'
+'dwmblocks|archlinux:latest|pacman -Syu --noconfirm --needed base-devel libx11 git|make CC="cc -Wno-error=incompatible-pointer-types" PREFIX=/root/.local install && test -x /root/.local/bin/dwmblocks && echo dwmblocks-built'
+'dwmblocks-async|archlinux:latest|pacman -Syu --noconfirm --needed base-devel libxcb xcb-util git|make LIBS="xcb-atom xcb" PREFIX=/root/.local install && test -x /root/.local/bin/dwmblocks && echo dwmblocks-async-built'
+'somebar|archlinux:latest|pacman -Syu --noconfirm --needed base-devel wayland wayland-protocols cairo pango meson ninja pkgconf git|cp src/config.def.hpp src/config.hpp && meson setup --prefix=/root/.local build && ninja -C build install && test -x /root/.local/bin/somebar && echo somebar-built'
+'someblocks|archlinux:latest|pacman -Syu --noconfirm --needed base-devel git|make CC="cc -Wno-error=incompatible-pointer-types" PREFIX=/root/.local install && test -x /root/.local/bin/someblocks && echo someblocks-built'
+'fff|archlinux:latest|pacman -Syu --noconfirm --needed base-devel git|make PREFIX=/root/.local install && test -x /root/.local/bin/fff && echo fff-built'
 )
 
 declare -A repo=(
