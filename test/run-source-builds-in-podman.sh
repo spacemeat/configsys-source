@@ -63,6 +63,19 @@ rows=(
 # extraction) — a sandbox limitation, not a recipe fault (both extract+build fine as a real
 # user). Verified by hand: git 2.47.1 (+ working git-remote-https clone); nmap 7.99 (C++ compile,
 # host-extracted tree built in-container).
+#
+# desktop.hu source-first tools (suckless X + dwl/Wayland). Built on Arch (rolling) so the X/Wayland
+# dev libs and, critically, wlroots are recent enough for dwl. dwmblocks/-async share the `dwmblocks`
+# binary. These have no `--version`; assert the binary exists.
+'dwm|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 libxinerama libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/dwm && echo dwm-built'
+'st|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/st && echo st-built'
+'dmenu|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 libxinerama libxft git|make PREFIX=/root/.local clean install && test -x /root/.local/bin/dmenu && echo dmenu-built'
+'dwmblocks|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 git|make PREFIX=/root/.local install && test -x /root/.local/bin/dwmblocks && echo dwmblocks-built'
+'dwmblocks-async|archlinux:latest|pacman -Sy --noconfirm --needed base-devel libx11 git|make PREFIX=/root/.local install && test -x /root/.local/bin/dwmblocks && echo dwmblocks-async-built'
+'dwl|archlinux:latest|pacman -Sy --noconfirm --needed base-devel wlroots wayland wayland-protocols libinput libxkbcommon pixman pkgconf git|make PREFIX=/root/.local install && test -x /root/.local/bin/dwl && echo dwl-built'
+'somebar|archlinux:latest|pacman -Sy --noconfirm --needed base-devel wayland wayland-protocols cairo pango meson ninja pkgconf git|meson setup --prefix=/root/.local build && ninja -C build install && test -x /root/.local/bin/somebar && echo somebar-built'
+'someblocks|archlinux:latest|pacman -Sy --noconfirm --needed base-devel git|make PREFIX=/root/.local install && test -x /root/.local/bin/someblocks && echo someblocks-built'
+'fff|archlinux:latest|pacman -Sy --noconfirm --needed base-devel git|make PREFIX=/root/.local install && test -x /root/.local/bin/fff && echo fff-built'
 )
 
 declare -A repo=(

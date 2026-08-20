@@ -19,7 +19,7 @@
 
     // Data layers: shared build-tool + dev-library components, the per-component source recipes,
     // and the profile amendments that wire those components into the repo's profiles.
-    data: [ tools.hu, sources.hu, profiles.hu ]
+    data: [ tools.hu, sources.hu, desktop.hu, profiles.hu ]
 
     // Pull in the auto-derived version floors (configsys-versions) so each recipe's toolchain
     // minimum (Rust MSRV, go.mod) stays current WITHOUT re-releasing these recipes: THIS plugin

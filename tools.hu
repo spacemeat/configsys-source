@@ -108,5 +108,34 @@
                     install: [ { via: native  name: { apt: libmagic-dev    dnf: file-devel      pacman: file    apk: file-dev    zypper: file-devel } } ] }
         libidn2:  { attrs: [ lib FOSS GNU copyleft ] description: "libidn2 — Internationalized Domain Names (IDNA2008) library (whois needs it)."
                     install: [ { via: native  name: { apt: libidn2-dev     dnf: libidn2-devel   apk: libidn2-dev  zypper: libidn2-devel } } ] }
+
+        // --- X11 dev libs (for the suckless source builds: dwm/st/dmenu/dwmblocks). pacman ships the
+        // headers in the base lib package (no -dev split), so `default:` = the bare name for Arch. ---
+        libx11:      { attrs: [ lib FOSS permissive ] description: "libX11 — the core X11 client library (dev headers + libs)."
+                       install: [ { via: native  name: { apt: libx11-dev  dnf: libX11-devel  apk: libx11-dev  zypper: libX11-devel  default: libx11 } } ] }
+        libxinerama: { attrs: [ lib FOSS permissive ] description: "libXinerama — the X11 multi-monitor (Xinerama) extension library (dev headers + libs)."
+                       install: [ { via: native  name: { apt: libxinerama-dev  dnf: libXinerama-devel  apk: libxinerama-dev  zypper: libXinerama-devel  default: libxinerama } } ] }
+        libxft:      { attrs: [ lib FOSS permissive ] description: "libXft — the X11 FreeType font-rendering library (dev headers + libs)."
+                       install: [ { via: native  name: { apt: libxft-dev  dnf: libXft-devel  apk: libxft-dev  zypper: libXft-devel  default: libxft } } ] }
+
+        // --- Wayland/wlroots dev libs (for the dwl source stack: dwl/somebar/someblocks). ---
+        wayland:           { attrs: [ lib FOSS permissive ] description: "Wayland — the core Wayland client/server library + scanner (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libwayland-dev  dnf: wayland-devel  apk: wayland-dev  zypper: wayland-devel  default: wayland } } ] }
+        wayland-protocols: { attrs: [ lib FOSS permissive ] description: "wayland-protocols — the standard Wayland protocol XML definitions."
+                             install: [ { via: native  name: { apt: wayland-protocols  dnf: wayland-protocols-devel  apk: wayland-protocols  zypper: wayland-protocols-devel  default: wayland-protocols } } ] }
+        // wlroots: dwl pins a specific wlroots MINOR per release (dwl 0.8 -> wlroots 0.19); a
+        // mismatched system wlroots fails the build. Pin the package / check out a matching dwl ref.
+        wlroots:           { attrs: [ lib FOSS permissive ] description: "wlroots — the modular Wayland compositor library (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libwlroots-dev  dnf: wlroots-devel  apk: wlroots-dev  zypper: wlroots-devel  default: wlroots } } ] }
+        libinput:          { attrs: [ lib FOSS permissive ] description: "libinput — the input-device handling library for Wayland/X (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libinput-dev  dnf: libinput-devel  apk: libinput-dev  zypper: libinput-devel  default: libinput } } ] }
+        libxkbcommon:      { attrs: [ lib FOSS permissive ] description: "libxkbcommon — the keyboard keymap handling library (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libxkbcommon-dev  dnf: libxkbcommon-devel  apk: libxkbcommon-dev  zypper: libxkbcommon-devel  default: libxkbcommon } } ] }
+        pixman:            { attrs: [ lib FOSS permissive ] description: "pixman — the low-level pixel-manipulation library (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libpixman-1-dev  dnf: pixman-devel  apk: pixman-dev  zypper: libpixman-1-0-devel  default: pixman } } ] }
+        cairo:             { attrs: [ lib FOSS copyleft ] description: "cairo — the 2D vector-graphics rendering library (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libcairo2-dev  dnf: cairo-devel  apk: cairo-dev  zypper: cairo-devel  default: cairo } } ] }
+        pango:             { attrs: [ lib FOSS copyleft ] description: "Pango — the text-layout and font-rendering library (dev headers + libs)."
+                             install: [ { via: native  name: { apt: libpango1.0-dev  dnf: pango-devel  apk: pango-dev  zypper: pango-devel  default: pango } } ] }
     }
 }

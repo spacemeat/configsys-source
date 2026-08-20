@@ -1,0 +1,49 @@
+{
+    // configsys-source/desktop.hu — SOURCE-FIRST builds of the suckless X stack and the dwl/Wayland
+    // stack. Unlike sources.hu (which ADDS a `via: source` option to already-packaged core tools),
+    // most components here are DEFINED with `via: source` as their ONLY method: they are config.h /
+    // config.hpp-compiled tools where building from your own (patched) checkout is the whole point.
+    // Fork the repo and override `repo:` (and/or pin a `ref:`) in your user layer to build YOUR
+    // config. Build deps are the X11 / Wayland dev libs in tools.hu. No `version:` -> build the
+    // default branch (HEAD). [UNVERIFIED: transcribed from each project's build docs, not
+    // container-built — the suckless Makefiles install to $PREFIX/bin (~/.local/bin) with PREFIX.]
+    components: {
+
+        // --- suckless X11 (edit config.h, then `make install`) ---
+        dwm: { attrs: [ GUI FOSS permissive ] description: "dwm — the suckless dynamic tiling window manager for Xorg (config.h-compiled)."
+            install: [ { via: source  repo: "https://git.suckless.org/dwm"  requires: [ libx11, libxinerama, libxft ]
+                         build: "make PREFIX=$PREFIX clean install" } ] }
+        st: { attrs: [ GUI FOSS permissive ] description: "st — the suckless simple terminal for Xorg (config.h-compiled)."
+            install: [ { via: source  repo: "https://git.suckless.org/st"  requires: [ libx11, libxft ]
+                         build: "make PREFIX=$PREFIX clean install" } ] }
+        dmenu: { attrs: [ GUI FOSS permissive ] description: "dmenu — the suckless dynamic menu / app launcher for X (config.h-compiled)."
+            install: [ { via: source  repo: "https://git.suckless.org/dmenu"  requires: [ libx11, libxinerama, libxft ]
+                         build: "make PREFIX=$PREFIX clean install" } ] }
+        // dwmblocks + dwmblocks-async both build the `dwmblocks` binary -> install ONE (alternatives).
+        dwmblocks: { attrs: [ CLI FOSS permissive ] description: "dwmblocks — a modular status-bar feeder for dwm (blocks defined in config.h)."
+            install: [ { via: source  repo: "https://github.com/torrinfail/dwmblocks"  requires: [ libx11 ]
+                         build: "make PREFIX=$PREFIX install" } ] }
+        dwmblocks-async: { attrs: [ CLI FOSS permissive ] description: "dwmblocks-async — an asynchronous rewrite of dwmblocks (concurrent status blocks)."
+            install: [ { via: source  repo: "https://github.com/UtkarshVerma/dwmblocks-async"  requires: [ libx11 ]
+                         build: "make PREFIX=$PREFIX install" } ] }
+
+        // --- dwl / Wayland (wlroots). dwl pins a wlroots MINOR per release; on a wlroots-mismatch
+        // build failure, pin the `wlroots` package or check out a matching dwl `ref:`. ---
+        dwl: { attrs: [ GUI FOSS copyleft ] description: "dwl — a dwm-like Wayland compositor built on wlroots (config.h-compiled)."
+            install: [ { via: source  repo: "https://codeberg.org/dwl/dwl"
+                         requires: [ wlroots, wayland, wayland-protocols, libinput, libxkbcommon, pixman, pkg-config ]
+                         build: "make PREFIX=$PREFIX install" } ] }
+        somebar: { attrs: [ GUI FOSS permissive ] description: "somebar — a dwm-like status/tag bar for dwl (config.hpp-compiled, meson build)."
+            install: [ { via: source  repo: "https://git.sr.ht/~raphi/somebar"
+                         requires: [ wayland, wayland-protocols, cairo, pango, meson, ninja, pkg-config ]
+                         build: "meson setup --prefix=$PREFIX build && ninja -C build install" } ] }
+        someblocks: { attrs: [ CLI FOSS permissive ] description: "someblocks — a dwmblocks-style status feeder for somebar (config.h-compiled)."
+            install: [ { via: source  repo: "https://git.sr.ht/~raphi/someblocks"
+                         build: "make PREFIX=$PREFIX install" } ] }
+
+        // fff (defined in core: native on Debian + AUR on Arch) — ADD a source method so it builds on
+        // Fedora/openSUSE/Alpine/EL too. Pure Bash: the Makefile installs the script into $PREFIX/bin.
+        fff: { install: [ { via: source  repo: "https://github.com/dylanaraps/fff"
+                            build: "make PREFIX=$PREFIX install" } ] }
+    }
+}
