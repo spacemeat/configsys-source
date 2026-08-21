@@ -16,5 +16,11 @@
         // here too — the capability and its profile placement arrive (and leave) together.
         c-cpp-libs: [ folly ]
         science: [ +science  fastdds ]
+        suckless-tools: [ dmenu  dwm  dwl  dwmblocks  dwmblocks-async  st  somebar  someblocks ]
+        // dwl is also a Wayland compositor — surface it in the repo's compositor picker (amend), not
+        // just the suckless bundle above. xpilot is source-only (no base binding), so its `games`
+        // profile is owned here (a fresh plugin profile; your `+games` amends compose on top).
+        desktops-compositors: [ +desktops-compositors  dwl ]
+        games: [ +games  xpilot ]
     }
 }
