@@ -12,16 +12,16 @@
     // `+self` term hooks the right base; a name with no lower definition just becomes a fresh
     // profile this plugin owns.
     profiles: {
-        // c-cpp-libs — every C/C++ library this plugin carries, all `lib`-attr and broadly useful.
-        // First the source-built application libs (sources.hu): folly + its deps, EASTL, the eProsima
-        // Fast DDS stack. Then the dev-libraries (tools.hu) the `source` recipes pull as build deps
-        // but which are useful in their own right: compression, crypto, XML, SQLite, SDL2, the X11
-        // and Wayland/wlroots/XCB stacks, and misc. Installing any pulls its own build deps.
-        c-cpp-libs: [ folly  fmt  gflags  glog  double-conversion  fast_float  eastl  fastdds  fastcdr  foonathan-memory
-                      ncurses  libevent  openssl  zlib  asio  tinyxml2  snappy  bzip2  libzstd  liblz4
-                      libsodium  liburing  libaio  libunwind  libdwarf  libiberty  libcurl  expat
-                      sdl2-ttf  sdl2-image  libpcap  sqlite  libmtp  fuse  libusb  libmagic  libidn2
-                      libx11  libxinerama  libxft  wayland  wayland-protocols  wlroots  libinput  libxkbcommon  pixman  cairo  pango  libxcb  xcb-util ]
+        // c-cpp-libs — the source-built C/C++ APPLICATION libraries (sources.hu): folly + its deps,
+        // EASTL, and the eProsima Fast DDS stack. Libraries you develop against.
+        c-cpp-libs: [ folly  fmt  gflags  glog  double-conversion  fast_float  eastl  fastdds  fastcdr  foonathan-memory ]
+        // c-cpp-dev-libs — the tools.hu DEV-LIBRARIES (headers + libs). The `source` recipes pull
+        // these as build deps, but they're useful in their own right: compression, crypto, XML,
+        // SQLite, SDL2, libcurl, the folly optional libs, and the X11 / Wayland-wlroots / XCB stacks.
+        c-cpp-dev-libs: [ ncurses  libevent  openssl  zlib  asio  tinyxml2  snappy  bzip2  libzstd  liblz4
+                          libsodium  liburing  libaio  libunwind  libdwarf  libiberty  libcurl  expat
+                          sdl2-ttf  sdl2-image  libpcap  sqlite  libmtp  fuse  libusb  libmagic  libidn2
+                          libx11  libxinerama  libxft  wayland  wayland-protocols  wlroots  libinput  libxkbcommon  pixman  cairo  pango  libxcb  xcb-util ]
         science: [ +science  fastdds ]
         suckless-tools: [ dmenu  dwm  dwl  dwmblocks  dwmblocks-async  st  somebar  someblocks ]
         // dwl is also a Wayland compositor — surface it in the repo's compositor picker (amend), not
