@@ -14,14 +14,10 @@
     profiles: {
         // c-cpp-libs — the source-built C/C++ APPLICATION libraries (sources.hu): folly + its deps,
         // EASTL, and the eProsima Fast DDS stack. Libraries you develop against.
-        c-cpp-libs: [ folly  fmt  gflags  glog  double-conversion  fast_float  eastl  fastdds  fastcdr  foonathan-memory ]
-        // c-cpp-dev-libs — the tools.hu DEV-LIBRARIES (headers + libs). The `source` recipes pull
-        // these as build deps, but they're useful in their own right: compression, crypto, XML,
-        // SQLite, SDL2, libcurl, the folly optional libs, and the X11 / Wayland-wlroots / XCB stacks.
-        c-cpp-dev-libs: [ ncurses  libevent  openssl  zlib  asio  tinyxml2  snappy  bzip2  libzstd  liblz4
-                          libsodium  liburing  libaio  libunwind  libdwarf  libiberty  libcurl  expat
-                          sdl2-ttf  sdl2-image  libpcap  sqlite  libmtp  fuse  libusb  libmagic  libidn2
-                          libx11  libxinerama  libxft  wayland  wayland-protocols  wlroots  libinput  libxkbcommon  pixman  cairo  pango  libxcb  xcb-util ]
+        c-cpp-libs: [ +c-cpp-libs  folly  fmt  gflags  glog  double-conversion  fast_float  eastl  fastdds  fastcdr  foonathan-memory ]
+        // The c-cpp-dev-libs DEV-LIBRARY members (ncurses, openssl, the X11/Wayland/XCB stacks, …)
+        // moved to base config.hu when their components were consolidated into base routes.hu — the
+        // plugin no longer amends that profile (they're recognized on every machine, plugin or not).
         science: [ +science  fastdds ]
         suckless-tools: [ dmenu  dwm  dwl  dwmblocks  dwmblocks-async  st  somebar  someblocks ]
         // dwl is also a Wayland compositor — surface it in the repo's compositor picker (amend), not
