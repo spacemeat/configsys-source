@@ -514,12 +514,15 @@
         // boost 1.74 / fmt 8) may fail cmake — build on a current distro or pin deps. Resolves on
         // debian/ubuntu/fedora/arch/alpine; on openSUSE it honestly errors — base `boost` has no
         // openSUSE binding (it splits into per-lib `-devel`s; a DEFERRED base gap).
-        // io_uring is DISABLED (-DCMAKE_DISABLE_FIND_PACKAGE_LibUring=ON): current folly targets a
-        // recent liburing (~2.5/2.6 — io_uring_buf_ring, IORING_OP_RECV_ZC, recvmsg_multishot), which
-        // most distros DON'T ship (Ubuntu/Pop 22.04 = liburing 2.1), and folly enabling its io_uring
-        // backend against an older liburing fails to compile. Off keeps folly building everywhere; to
-        // opt back in, install liburing >= 2.6 and drop that flag. (libaio async IO is unaffected.)
-        // [UNVERIFIED: transcribed from folly's CMake/folly-deps.cmake, not container-built.]
+        // io_uring is DISABLED. Current folly targets a recent liburing (~2.5/2.6 — io_uring_buf_ring,
+        // IORING_OP_RECV_ZC, recvmsg_multishot); most distros ship older (Ubuntu/Pop 22.04 = 2.1) and
+        // folly's io_uring backend then fails to compile. The catch: folly gates it on FOLLY_HAS_LIBURING,
+        // which folly/io/async/Liburing.h sets from `#if __has_include(<liburing.h>)` with NO #ifndef
+        // guard — so a distro liburing-dev flips it on and neither -DCMAKE_DISABLE_FIND_PACKAGE_LibUring
+        // (a CMake var, not this macro) nor -DFOLLY_HAS_LIBURING=0 (the header redefines it) can turn it
+        // off. The one reliable way is to rewrite that header to 0 before building (first build step).
+        // libaio async IO is unaffected. To KEEP io_uring, install liburing >= 2.6 and drop that step.
+        // [UNVERIFIED: transcribed from folly's CMake + Liburing.h, not container-built.]
         folly: {
             description: "Folly — Facebook's C++ component library (Facebook Open-source Library)."
             install: [
@@ -528,7 +531,8 @@
                   requires: [ cxx, cmake, make, boost, openssl, libevent, zlib, fmt, fast_float, gflags,
                               glog, double-conversion, libzstd, liblz4, snappy, bzip2 ]
                   suggests: [ libsodium, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them. (liburing left OUT — see io_uring note above)
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_LibUring=ON && cmake --build build -j$(nproc) && cmake --install build" }
+                  build: [ "echo '#pragma once' > folly/io/async/Liburing.h && echo '#define FOLLY_HAS_LIBURING 0' >> folly/io/async/Liburing.h"   // force io_uring OFF (see note) — the source driver's `git checkout -f` restores this file each build
+                           "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) && cmake --install build" ] }
             ]
         }
     }
