@@ -514,14 +514,17 @@
         // boost 1.74 / fmt 8) may fail cmake — build on a current distro or pin deps. Resolves on
         // debian/ubuntu/fedora/arch/alpine; on openSUSE it honestly errors — base `boost` has no
         // openSUSE binding (it splits into per-lib `-devel`s; a DEFERRED base gap).
-        // io_uring is DISABLED. Current folly targets a recent liburing (~2.5/2.6 — io_uring_buf_ring,
-        // IORING_OP_RECV_ZC, recvmsg_multishot); most distros ship older (Ubuntu/Pop 22.04 = 2.1) and
-        // folly's io_uring backend then fails to compile. The catch: folly gates it on FOLLY_HAS_LIBURING,
-        // which folly/io/async/Liburing.h sets from `#if __has_include(<liburing.h>)` with NO #ifndef
-        // guard — so a distro liburing-dev flips it on and neither -DCMAKE_DISABLE_FIND_PACKAGE_LibUring
-        // (a CMake var, not this macro) nor -DFOLLY_HAS_LIBURING=0 (the header redefines it) can turn it
-        // off. The one reliable way is to rewrite that header to 0 before building (first build step).
-        // libaio async IO is unaffected. To KEEP io_uring, install liburing >= 2.6 and drop that step.
+        // io_uring: ENABLED, with a source-built liburing. Current folly needs a recent liburing
+        // (~2.6+ — io_uring_buf_ring, IORING_OP_RECV_ZC, recvmsg_multishot) that most distros don't ship
+        // (Ubuntu/Pop 22.04 = 2.1), so the FIRST build step builds the latest liburing release into
+        // $PREFIX — idempotent (skipped when $PREFIX already carries a new-enough header). folly's
+        // -DCMAKE_PREFIX_PATH=$PREFIX then finds it (over the older system copy) so io_uring compiles;
+        // the -DCMAKE_INSTALL_RPATH flags make folly.so load THIS liburing (and folly's other $PREFIX
+        // deps) at RUNTIME, not the system's older one. NOTE: liburing is built inline rather than via
+        // `requires:` because the core `liburing` is a NATIVE dev-lib (older) that would shadow a source
+        // binding — this mirrors how folly's other version-fragile deps land in $PREFIX. io_uring's
+        // newer ops need a recent kernel, but folly probes IORING_FEAT_* at runtime and falls back, so
+        // this is safe on older kernels. To build WITHOUT io_uring, pre-seed an empty Liburing.h.
         // [UNVERIFIED: transcribed from folly's CMake + Liburing.h, not container-built.]
         folly: {
             description: "Folly — Facebook's C++ component library (Facebook Open-source Library)."
@@ -530,9 +533,9 @@
                   version: { github: facebook/folly  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake, make, boost, openssl, libevent, zlib, fmt, fast_float, gflags,
                               glog, double-conversion, libzstd, liblz4, snappy, bzip2 ]
-                  suggests: [ libsodium, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them. (liburing left OUT — see io_uring note above)
-                  build: [ "echo '#pragma once' > folly/io/async/Liburing.h && echo '#define FOLLY_HAS_LIBURING 0' >> folly/io/async/Liburing.h"   // force io_uring OFF (see note) — the source driver's `git checkout -f` restores this file each build
-                           "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) && cmake --install build" ] }
+                  suggests: [ libsodium, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them
+                  build: [ "grep -qs IORING_OP_RECV_ZC $PREFIX/include/liburing/io_uring.h || { t=$(git ls-remote --tags --refs --sort=-v:refname https://github.com/axboe/liburing 'refs/tags/liburing-[0-9]*' | sed 's#.*/##' | grep -vE -- '-(rc|beta)' | head -1) && d=$(mktemp -d) && git clone --depth 1 --branch $t https://github.com/axboe/liburing $d && ( cd $d && ./configure --prefix=$PREFIX && make -j$(nproc) && make install ) && rm -rf $d; }"   // build the latest STABLE liburing into $PREFIX for folly's io_uring backend (idempotent)
+                           "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=$PREFIX/lib -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON && cmake --build build -j$(nproc) && cmake --install build" ] }
             ]
         }
     }
