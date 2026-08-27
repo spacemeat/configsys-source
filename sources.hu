@@ -514,6 +514,11 @@
         // boost 1.74 / fmt 8) may fail cmake — build on a current distro or pin deps. Resolves on
         // debian/ubuntu/fedora/arch/alpine; on openSUSE it honestly errors — base `boost` has no
         // openSUSE binding (it splits into per-lib `-devel`s; a DEFERRED base gap).
+        // io_uring is DISABLED (-DCMAKE_DISABLE_FIND_PACKAGE_LibUring=ON): current folly targets a
+        // recent liburing (~2.5/2.6 — io_uring_buf_ring, IORING_OP_RECV_ZC, recvmsg_multishot), which
+        // most distros DON'T ship (Ubuntu/Pop 22.04 = liburing 2.1), and folly enabling its io_uring
+        // backend against an older liburing fails to compile. Off keeps folly building everywhere; to
+        // opt back in, install liburing >= 2.6 and drop that flag. (libaio async IO is unaffected.)
         // [UNVERIFIED: transcribed from folly's CMake/folly-deps.cmake, not container-built.]
         folly: {
             description: "Folly — Facebook's C++ component library (Facebook Open-source Library)."
@@ -522,8 +527,8 @@
                   version: { github: facebook/folly  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake, make, boost, openssl, libevent, zlib, fmt, fast_float, gflags,
                               glog, double-conversion, libzstd, liblz4, snappy, bzip2 ]
-                  suggests: [ libsodium, liburing, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) && cmake --install build" }
+                  suggests: [ libsodium, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them. (liburing left OUT — see io_uring note above)
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_LibUring=ON && cmake --build build -j$(nproc) && cmake --install build" }
             ]
         }
     }
