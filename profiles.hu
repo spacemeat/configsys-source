@@ -19,11 +19,21 @@
         // moved to base config.hu when their components were consolidated into base routes.hu — the
         // plugin no longer amends that profile (they're recognized on every machine, plugin or not).
         science: [ +science  fastdds ]
-        // The runnable suckless tools. sbase/ubase/9base (PATH-shadowing) and the libs
-        // (libgrapheme/libzahl) are deliberately component-only — install those by name.
+        // suckless-libs — the freestanding C libraries (build targets you link against). Grouped as a
+        // profile for convenience; normally pulled by name or as a `requires:` of whatever needs them.
+        suckless-libs: [ libgrapheme  libzahl ]
+        // The runnable suckless tools. 9base is safe to bundle here — it installs under $PREFIX/plan9
+        // (off PATH), so it shadows nothing. sbase/ubase are NOT here — see suckless-coreutils below.
         suckless-tools: [ dmenu  dwm  dwl  dwmblocks  dwmblocks-async  st  somebar  someblocks
                           slock  tabbed  slstatus  sent  svkbd  lsw  xssstate  surf  farbfeld
-                          scron  ii  sic  smu  quark  blind ]
+                          scron  ii  sic  smu  quark  blind  9base ]
+        // suckless-coreutils — sbase (POSIX coreutils clones: ls/cat/cp/…) + ubase (Linux base utils:
+        // mount/mkfs/…). These install same-named binaries into ~/.local/bin, usually EARLIER on PATH
+        // than /usr/bin, so ACTIVATING this profile SHADOWS your system coreutils/util-linux with
+        // feature-incomplete versions. That's the whole point of the bundle — activate it only if you
+        // deliberately want the suckless userland, and NEVER `+suckless-coreutils` into a broad profile
+        // (terminal/user) or you'll shadow `ls`/`cp` for everyone on it unawares.
+        suckless-coreutils: [ sbase  ubase ]
         // dwl is also a Wayland compositor — surface it in the repo's compositor picker (amend), not
         // just the suckless bundle above. xpilot is source-only (no base binding), so its `games`
         // profile is owned here (a fresh plugin profile; your `+games` amends compose on top).

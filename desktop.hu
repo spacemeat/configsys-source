@@ -69,16 +69,16 @@
         blind: { attrs: [ CLI FOSS permissive ] description: "blind — a suite of small utilities for editing raw (headerless) video streams."
             install: [ { via: source  repo: "https://git.suckless.org/blind"  build: "make PREFIX=$PREFIX install" } ] }
 
-        // sbase / ubase — suckless coreutils/util-linux clones. NOT added to the suckless-tools profile:
-        // they install ~dozens of binaries (ls, cp, mount, …) into $PREFIX/bin (~/.local/bin), which is
-        // usually EARLIER in PATH than /usr/bin — so they SHADOW the system tools. Install by name only,
-        // deliberately, if that's what you want.
+        // sbase / ubase — suckless coreutils/util-linux clones. Bundled in the `suckless-coreutils`
+        // profile (and NOT any broad one): they install ~dozens of binaries (ls, cp, mount, …) into
+        // $PREFIX/bin (~/.local/bin), usually EARLIER in PATH than /usr/bin — so they SHADOW the system
+        // tools. Activate that profile (or install by name) deliberately, only if that's what you want.
         sbase: { attrs: [ CLI FOSS permissive ] description: "sbase — suckless portable POSIX coreutils clones (ls/cat/cp/… — SHADOWS system coreutils in ~/.local/bin)."
             install: [ { via: source  repo: "https://git.suckless.org/sbase"  build: "make PREFIX=$PREFIX install" } ] }
         ubase: { attrs: [ CLI FOSS permissive ] description: "ubase — suckless Linux base utilities (mount/mkfs/… — Linux-only; SHADOWS util-linux in ~/.local/bin)."
             install: [ { via: source  repo: "https://git.suckless.org/ubase"  build: "make PREFIX=$PREFIX install" } ] }
-        // 9base — a port of the Plan 9 userland tools. Installs under $PREFIX/plan9; kept out of the
-        // profile (component-only) since some names overlap common tools. [UNVERIFIED build path.]
+        // 9base — a port of the Plan 9 userland tools. Installs under $PREFIX/plan9 (off PATH), so it
+        // shadows nothing; it rides in the `suckless-tools` profile. [UNVERIFIED build path.]
         9base: { attrs: [ CLI FOSS permissive ] description: "9base — a port of the Plan 9 userland utilities (rc, awk, sed, …)."
             install: [ { via: source  repo: "https://git.suckless.org/9base"  build: "make PREFIX=$PREFIX install" } ] }
 
