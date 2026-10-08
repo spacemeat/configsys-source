@@ -54,9 +54,9 @@ rows=(
 # configsys models via `requires:`. Here the build clones the two deps itself (the harness only clones
 # the component's own repo). Asio/TinyXML2/OpenSSL come from the distro (asio-devel etc.).
 'fastdds|fedora:41|dnf install -y -q gcc-c++ cmake make git asio-devel tinyxml2-devel openssl-devel|git clone --depth 1 https://github.com/eProsima/foonathan_memory_vendor /fm && cmake -S /fm -B /fm/b -DCMAKE_INSTALL_PREFIX=/root/.local -DBUILD_SHARED_LIBS=ON && cmake --build /fm/b -j$(nproc) --target install && git clone --depth 1 https://github.com/eProsima/Fast-CDR /fc && cmake -S /fc -B /fc/b -DCMAKE_INSTALL_PREFIX=/root/.local -DBUILD_SHARED_LIBS=ON && cmake --build /fc/b -j$(nproc) --target install && cmake -B build -DCMAKE_INSTALL_PREFIX=/root/.local -DCMAKE_PREFIX_PATH=/root/.local -DBUILD_SHARED_LIBS=ON -DCOMPILE_EXAMPLES=OFF -DBUILD_TESTING=OFF . && cmake --build build -j$(nproc) --target install && ls /root/.local/lib/libfastdds.so* /root/.local/lib/libfastrtps.so* 2>/dev/null | head -1 && echo fastdds-built'
-# xpilot: the maintained kekyo/xpilot-ng fork; its `master` builds the SDL2/GL client + server on a
+# xpilot: the maintained kekyo fork (XPilot Infinity, formerly xpilot-ng); its `master` builds the SDL2/GL client + server on a
 # modern toolchain (the legacy X11 clients need the removed Xxf86misc extension, so we --disable them).
-'xpilot|ubuntu:24.04|apt-get update -qq && apt-get install -y -qq build-essential gcc-14 g++-14 autoconf automake libtool pkg-config libexpat1-dev zlib1g-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libgl1-mesa-dev libglu1-mesa-dev git|export CC="$(command -v gcc-14 || command -v gcc)"; export CXX="$(command -v g++-14 || command -v g++)"; ( ./bootstrap || autoreconf -fi ) && ./configure --prefix=/root/.local --disable-x11-client --disable-xp-mapedit --disable-replay && make -j$(nproc) && make install && ls /root/.local/bin/xpilot-ng-sdl /root/.local/bin/xpilot-ng-server && echo xpilot-built'
+'xpilot|ubuntu:24.04|apt-get update -qq && apt-get install -y -qq build-essential gcc-14 g++-14 autoconf automake libtool pkg-config cmake git libexpat1-dev zlib1g-dev libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev libfontconfig-dev libopenal-dev libalut-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxtst-dev libxfixes-dev libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev|export CC="$(command -v gcc-14 || command -v gcc)"; export CXX="$(command -v g++-14 || command -v g++)"; git submodule update --init --recursive -q && vendor/sdl3/build.sh --build-dir="$PWD/.sdl3-build" --prefix="$PWD/.sdl3-prefix" --vendored-font-deps --disable-libusb && ( ./bootstrap || autoreconf -fi ) && ./configure --prefix=/root/.local --with-sdl3=vendored --with-sdl3-prefix="$PWD/.sdl3-prefix" --disable-x11-client --disable-xp-mapedit --disable-replay --disable-server-tray && XV="$(git describe --tags --always)" && XC="$(git rev-parse HEAD)" && make -j$(nproc) XPILOT_VERSION="$XV" XPILOT_COMMIT_ID="$XC" && make install XPILOT_VERSION="$XV" XPILOT_COMMIT_ID="$XC" && ls /root/.local/bin/xpilot-infinity-sdl /root/.local/bin/xpilot-infinity-server && echo xpilot-built'
 # NOTE: git and nmap are source-buildable and verified out-of-band, but are NOT gated here.
 # Both trip a rootless-podman user-namespace quirk where `tar` cannot chmod certain archived
 # dirs as container-root (git's install-time template tree; nmap's bundled `zenmap` dir on
@@ -103,7 +103,7 @@ declare -A repo=(
   [whois]=https://github.com/rfc1036/whois
   [cmake]=https://github.com/Kitware/CMake [ffmpeg]=https://github.com/FFmpeg/FFmpeg
   [fastdds]=https://github.com/eProsima/Fast-DDS
-  [xpilot]=https://github.com/kekyo/xpilot-ng
+  [xpilot]=https://github.com/kekyo/xpilot-infinity
   [dwm]=https://git.suckless.org/dwm [st]=https://git.suckless.org/st
   [dmenu]=https://git.suckless.org/dmenu
   [dwmblocks]=https://github.com/torrinfail/dwmblocks
