@@ -28,7 +28,7 @@
             install: [
                 { via: source  repo: "https://github.com/BurntSushi/ripgrep"
                   version: { github: BurntSushi/ripgrep }  requires: cargo
-                  build: "cargo build --release && install -Dm755 target/release/rg $PREFIX/bin/rg" }
+                  build: "cargo build --release && $SUDO install -Dm755 target/release/rg $PREFIX/bin/rg" }
             ]
         }
         // just: pure Rust cargo build (bare-semver tags; MSRV lives in the version-floors plugin).
@@ -36,7 +36,7 @@
             install: [
                 { via: source  repo: "https://github.com/casey/just"
                   version: { github: casey/just }  requires: cargo
-                  build: "cargo build --release && install -Dm755 target/release/just $PREFIX/bin/just" }
+                  build: "cargo build --release && $SUDO install -Dm755 target/release/just $PREFIX/bin/just" }
             ]
         }
         // nushell (`nu`): the workspace root IS the `nu` package; default features use rustls (no
@@ -45,7 +45,7 @@
             install: [
                 { via: source  repo: "https://github.com/nushell/nushell"
                   version: { github: nushell/nushell }  requires: cargo
-                  build: "cargo build --release --bin nu && install -Dm755 target/release/nu $PREFIX/bin/nu" }
+                  build: "cargo build --release --bin nu && $SUDO install -Dm755 target/release/nu $PREFIX/bin/nu" }
             ]
         }
         // yazi: builds TWO binaries — `yazi` (yazi-fm) and `ya` (yazi-cli) — from the workspace.
@@ -55,7 +55,7 @@
                 { via: source  repo: "https://github.com/sxyazi/yazi"
                   version: { github: sxyazi/yazi  strip-v: true }  tag-prefix: "v"  requires: [ cargo, cc, make ]
                   // cc+make: the tikv-jemalloc-sys dep compiles bundled jemalloc from C via `make`.
-                  build: "cargo build --release --locked && install -Dm755 target/release/yazi $PREFIX/bin/yazi && install -Dm755 target/release/ya $PREFIX/bin/ya" }
+                  build: "cargo build --release --locked && $SUDO install -Dm755 target/release/yazi $PREFIX/bin/yazi && $SUDO install -Dm755 target/release/ya $PREFIX/bin/ya" }
             ]
         }
         // helix DEFERRED — the recipe (cargo install helix-term + auto tree-sitter grammars +
@@ -75,14 +75,14 @@
             install: [
                 { via: source  repo: "https://github.com/jesseduffield/lazygit"
                   version: { github: jesseduffield/lazygit  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o lazygit . && install -Dm755 lazygit $PREFIX/bin/lazygit" }
+                  build: "CGO_ENABLED=0 go build -o lazygit . && $SUDO install -Dm755 lazygit $PREFIX/bin/lazygit" }
             ]
         }
         superfile: {
             install: [
                 { via: source  repo: "https://github.com/yorukot/superfile"
                   version: { github: yorukot/superfile  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o spf . && install -Dm755 spf $PREFIX/bin/spf" }
+                  build: "CGO_ENABLED=0 go build -o spf . && $SUDO install -Dm755 spf $PREFIX/bin/spf" }
             ]
         }
         // fzf: a plain Go build straight into the prefix (folded from core). Bare-version tags.
@@ -90,7 +90,7 @@
             install: [
                 { via: source  repo: "https://github.com/junegunn/fzf"
                   version: { github: junegunn/fzf }  requires: go
-                  build: "mkdir -p $PREFIX/bin && go build -o $PREFIX/bin/fzf" }
+                  build: "go build -o fzf && $SUDO install -Dm755 fzf $PREFIX/bin/fzf" }
             ]
         }
         // lazydocker / lazysql / k9s: single-module pure-Go tools, main pkg at the repo root.
@@ -99,21 +99,21 @@
             install: [
                 { via: source  repo: "https://github.com/jesseduffield/lazydocker"
                   version: { github: jesseduffield/lazydocker  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o lazydocker . && install -Dm755 lazydocker $PREFIX/bin/lazydocker" }
+                  build: "CGO_ENABLED=0 go build -o lazydocker . && $SUDO install -Dm755 lazydocker $PREFIX/bin/lazydocker" }
             ]
         }
         lazysql: {
             install: [
                 { via: source  repo: "https://github.com/jorgerojas26/lazysql"
                   version: { github: jorgerojas26/lazysql  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o lazysql . && install -Dm755 lazysql $PREFIX/bin/lazysql" }
+                  build: "CGO_ENABLED=0 go build -o lazysql . && $SUDO install -Dm755 lazysql $PREFIX/bin/lazysql" }
             ]
         }
         k9s: {
             install: [
                 { via: source  repo: "https://github.com/derailed/k9s"
                   version: { github: derailed/k9s  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o k9s . && install -Dm755 k9s $PREFIX/bin/k9s" }
+                  build: "CGO_ENABLED=0 go build -o k9s . && $SUDO install -Dm755 k9s $PREFIX/bin/k9s" }
             ]
         }
         // opentofu (`tofu`): main at ./cmd/tofu. High go.mod floor (patch-pinned ~1.26) — the
@@ -123,7 +123,7 @@
             install: [
                 { via: source  repo: "https://github.com/opentofu/opentofu"
                   version: { github: opentofu/opentofu  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o tofu ./cmd/tofu && install -Dm755 tofu $PREFIX/bin/tofu" }
+                  build: "CGO_ENABLED=0 go build -o tofu ./cmd/tofu && $SUDO install -Dm755 tofu $PREFIX/bin/tofu" }
             ]
         }
         // bazelisk: main at the repo ROOT (not ./cmd). grpcurl: main at ./cmd/grpcurl.
@@ -131,14 +131,14 @@
             install: [
                 { via: source  repo: "https://github.com/bazelbuild/bazelisk"
                   version: { github: bazelbuild/bazelisk  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o bazelisk . && install -Dm755 bazelisk $PREFIX/bin/bazelisk" }
+                  build: "CGO_ENABLED=0 go build -o bazelisk . && $SUDO install -Dm755 bazelisk $PREFIX/bin/bazelisk" }
             ]
         }
         grpcurl: {
             install: [
                 { via: source  repo: "https://github.com/fullstorydev/grpcurl"
                   version: { github: fullstorydev/grpcurl  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -o grpcurl ./cmd/grpcurl && install -Dm755 grpcurl $PREFIX/bin/grpcurl" }
+                  build: "CGO_ENABLED=0 go build -o grpcurl ./cmd/grpcurl && $SUDO install -Dm755 grpcurl $PREFIX/bin/grpcurl" }
             ]
         }
         // helm: main at ./cmd/helm. Plain build (no version ldflags) — the version vars have safe
@@ -148,7 +148,7 @@
             install: [
                 { via: source  repo: "https://github.com/helm/helm"
                   version: { github: helm/helm  strip-v: true }  tag-prefix: "v"  requires: go
-                  build: "CGO_ENABLED=0 go build -trimpath -o helm ./cmd/helm && install -Dm755 helm $PREFIX/bin/helm" }
+                  build: "CGO_ENABLED=0 go build -trimpath -o helm ./cmd/helm && $SUDO install -Dm755 helm $PREFIX/bin/helm" }
             ]
         }
 
@@ -158,7 +158,7 @@
             install: [
                 { via: source  repo: "https://github.com/aristocratos/btop"
                   version: { github: aristocratos/btop }  requires: [ cxx, make ]
-                  build: "make && make install PREFIX=$PREFIX" }
+                  build: "make && $SUDO make install PREFIX=$PREFIX" }
             ]
         }
         // fastfetch: CMake; optional feature libs are auto-detected/skipped. Folded from core.
@@ -166,7 +166,7 @@
             install: [
                 { via: source  repo: "https://github.com/fastfetch-cli/fastfetch"
                   version: { github: fastfetch-cli/fastfetch }  requires: [ cc, cmake ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX && cmake --build build && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX && cmake --build build && $SUDO cmake --install build" }
             ]
         }
         // neovim: bundles its own deps (libuv/luajit/tree-sitter/...) — the top-level Makefile builds
@@ -178,7 +178,7 @@
                 { via: source  repo: "https://github.com/neovim/neovim"
                   version: { github: neovim/neovim  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, cxx, cmake, ninja, make, gettext, curl, unzip ]
-                  build: "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$PREFIX && make install" }
+                  build: "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$PREFIX && $SUDO cmake --install build" }   // install from the built tree (`make install` would rebuild as root)
             ]
         }
         // nethogs: C++ Makefile; needs libpcap (packet capture) + ncurses. Its `make install` drops the
@@ -190,7 +190,7 @@
                 { via: source  repo: "https://github.com/raboof/nethogs"
                   version: { github: raboof/nethogs  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, cxx, make, ncurses, libpcap ]
-                  build: "make && install -Dm755 src/nethogs $PREFIX/bin/nethogs" }
+                  build: "make && $SUDO install -Dm755 src/nethogs $PREFIX/bin/nethogs" }
             ]
         }
         // ninja: tiny C++ build tool — cmake build (bootstraps itself). vX.Y.Z tags.
@@ -200,7 +200,7 @@
                 { via: source  repo: "https://github.com/ninja-build/ninja"
                   version: { github: ninja-build/ninja  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release && cmake --build build && $SUDO cmake --install build" }
             ]
         }
         // protobuf (protoc): cmake build; vendors abseil as a git submodule (`--init` first,
@@ -210,7 +210,7 @@
                 { via: source  repo: "https://github.com/protocolbuffers/protobuf"
                   version: { github: protocolbuffers/protobuf  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, cxx, cmake, make ]
-                  build: "git submodule update --init --recursive && cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module && cmake --build build && cmake --install build" }
+                  build: "git submodule update --init --recursive && cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module && cmake --build build && $SUDO cmake --install build" }
             ]
         }
         // whois: Marco d'Itri's whois (the `whois` on Debian). Plain Makefile; needs libidn2 (IDN) +
@@ -221,7 +221,7 @@
                 { via: source  version: { static: "5.6.6" }  tag-prefix: "v"
                   repo: "https://github.com/rfc1036/whois"
                   requires: [ cc, make, perl, libidn2, gettext ]
-                  build: "make && make install prefix=$PREFIX" }
+                  build: "make && $SUDO make install prefix=$PREFIX" }
             ]
         }
         // cmake: bootstraps itself (./bootstrap uses the system compiler + bundled deps), then make.
@@ -231,7 +231,7 @@
                 { via: source  repo: "https://github.com/Kitware/CMake"
                   version: { github: Kitware/CMake  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, cxx, make, openssl ]   // ./bootstrap's bundled cmcurl needs OpenSSL
-                  build: "./bootstrap --prefix=$PREFIX --parallel=$(nproc) && make -j$(nproc) && make install" }
+                  build: "./bootstrap --prefix=$PREFIX --parallel=$(nproc) && make -j$(nproc) && $SUDO make install" }
             ]
         }
 
@@ -244,8 +244,8 @@
                 { via: source  repo: "https://github.com/htop-dev/htop"
                   version: { github: htop-dev/htop }
                   requires: [ cc, make, autoconf, automake, pkg-config, ncurses ]
-                  build: "./autogen.sh && ./configure --prefix=$PREFIX && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./autogen.sh && ./configure --prefix=$PREFIX && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // tmux: needs libevent + ncurses, and a yacc (bison) for its grammar. `sh autogen.sh`
@@ -255,8 +255,8 @@
                 { via: source  repo: "https://github.com/tmux/tmux"
                   version: { github: tmux/tmux }
                   requires: [ cc, make, autoconf, automake, pkg-config, bison, ncurses, libevent ]
-                  build: "sh autogen.sh && ./configure --prefix=$PREFIX && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "sh autogen.sh && ./configure --prefix=$PREFIX && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // jq: autotools, but a git checkout ships no `configure` (regenerate with autoreconf) and
@@ -268,8 +268,8 @@
                 { via: source  repo: "https://github.com/jqlang/jq"
                   version: { github: jqlang/jq }
                   requires: [ cc, make, autoconf, automake, libtool, bison, flex ]
-                  build: "git submodule update --init && autoreconf -fi && ./configure --prefix=$PREFIX --with-oniguruma=builtin --disable-maintainer-mode && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "git submodule update --init && autoreconf -fi && ./configure --prefix=$PREFIX --with-oniguruma=builtin --disable-maintainer-mode && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // mtr: autotools via ./bootstrap.sh. Installs mtr/mtr-packet as sbin_PROGRAMS, so force
@@ -280,8 +280,8 @@
                 { via: source  repo: "https://github.com/traviscross/mtr"
                   version: { github: traviscross/mtr  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, make, autoconf, automake, pkg-config, ncurses ]
-                  build: "./bootstrap.sh && ./configure --prefix=$PREFIX --sbindir=$PREFIX/bin --without-gtk && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./bootstrap.sh && ./configure --prefix=$PREFIX --sbindir=$PREFIX/bin --without-gtk && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // curl: autotools; a git checkout has no configure (autoreconf -fi first). System OpenSSL +
@@ -293,8 +293,8 @@
                 { via: source  repo: "https://github.com/curl/curl"
                   version: { github: curl/curl }
                   requires: [ cc, make, pkg-config, autoconf, automake, libtool, openssl, zlib ]
-                  build: "autoreconf -fi && ./configure --prefix=$PREFIX --with-openssl --with-zlib --without-libpsl && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "autoreconf -fi && ./configure --prefix=$PREFIX --with-openssl --with-zlib --without-libpsl && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // git: hand-written Makefile (NO autotools) — plain `make prefix=` is the documented path;
@@ -307,7 +307,7 @@
                 { via: source  repo: "https://github.com/git/git"
                   version: { github: git/git  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, make, zlib, libcurl, openssl, expat, gettext, perl ]
-                  build: "make -j$(nproc) prefix=$PREFIX NO_TCLTK=1 all && make prefix=$PREFIX NO_TCLTK=1 install" }
+                  build: "make -j$(nproc) prefix=$PREFIX NO_TCLTK=1 all && $SUDO make prefix=$PREFIX NO_TCLTK=1 install" }
             ]
         }
         // nmap: its github repo is a TAGLESS SVN mirror, so build from the upstream release TARBALL
@@ -320,8 +320,8 @@
                 { via: source  version: { static: 7.99 }
                   url: "https://nmap.org/dist/nmap-$VERSION.tar.bz2"
                   requires: [ cxx, cc, make ]
-                  build: "./configure --prefix=$PREFIX && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./configure --prefix=$PREFIX && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // iperf3: ships a committed ./configure (no autoreconf); bundles cJSON, so a C toolchain is
@@ -332,8 +332,8 @@
                 { via: source  repo: "https://github.com/esnet/iperf"
                   version: { github: esnet/iperf }
                   requires: [ cc, make ]
-                  build: "./configure --prefix=$PREFIX && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./configure --prefix=$PREFIX && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // vnstat: ships a committed ./configure; needs sqlite (its stats DB). vX.Y tags.
@@ -343,8 +343,8 @@
                 { via: source  repo: "https://github.com/vergoh/vnstat"
                   version: { github: vergoh/vnstat  strip-v: true }  tag-prefix: "v"
                   requires: [ cc, make, sqlite ]
-                  build: "./configure --prefix=$PREFIX && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./configure --prefix=$PREFIX && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // jmtpfs: MTP/Android FUSE mount. Ships a committed ./configure (its OWN generated autotools,
@@ -356,8 +356,8 @@
                 { via: source  version: { static: "0.5" }  tag-prefix: "v"
                   repo: "https://github.com/JasonFerrara/jmtpfs"
                   requires: [ cxx, make, pkg-config, libmtp, fuse, libusb, libmagic ]
-                  build: "./configure --prefix=$PREFIX && make && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./configure --prefix=$PREFIX && make && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // ffmpeg: custom ./configure (NOT autotools). BASELINE build — built-in codecs/muxers only
@@ -369,8 +369,8 @@
                 { via: source  version: { static: "8.1.2" }  tag-prefix: "n"
                   repo: "https://github.com/FFmpeg/FFmpeg"
                   requires: [ cc, make, nasm ]
-                  build: "./configure --prefix=$PREFIX --disable-doc --enable-gpl && make -j$(nproc) && make install"
-                  uninstall-cmd: "make uninstall" }
+                  build: "./configure --prefix=$PREFIX --disable-doc --enable-gpl && make -j$(nproc) && $SUDO make install"
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // socat DEFERRED — the recipe itself is fine (`autoconf` only [not autoreconf — its
@@ -401,7 +401,7 @@
                 { via: source  repo: "https://github.com/eProsima/foonathan_memory_vendor"
                   version: { github: eProsima/foonathan_memory_vendor  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) --target install" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         fastcdr: { attrs: [ lib FOSS permissive ]
@@ -410,7 +410,7 @@
                 { via: source  repo: "https://github.com/eProsima/Fast-CDR"
                   version: { github: eProsima/Fast-CDR  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) --target install" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON . && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         fastdds: { attrs: [ lib FOSS permissive ]
@@ -419,7 +419,7 @@
                 { via: source  repo: "https://github.com/eProsima/Fast-DDS"
                   version: { github: eProsima/Fast-DDS  strip-v: true }  tag-prefix: "v"
                   requires: [ cxx, cmake, openssl, asio, tinyxml2, fastcdr, foonathan-memory ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_PREFIX_PATH=$PREFIX -DBUILD_SHARED_LIBS=ON -DCOMPILE_EXAMPLES=OFF -DBUILD_TESTING=OFF . && cmake --build build -j$(nproc) --target install" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_PREFIX_PATH=$PREFIX -DBUILD_SHARED_LIBS=ON -DCOMPILE_EXAMPLES=OFF -DBUILD_TESTING=OFF . && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         // XPilot — the classic 1990s multiplayer 2D space-combat game. No distro packages it anymore
@@ -447,8 +447,8 @@
                               fontconfig-dev, openal-dev, freealut-dev,
                               libx11, libxext, libxrandr, libxcursor, libxi, libxss, libxtst, libxfixes, libxkbcommon,
                               wayland, wayland-protocols, libdecor ]
-                  build: 'export CC="$(command -v gcc-14 || command -v gcc-13 || command -v gcc)"; export CXX="$(command -v g++-14 || command -v g++-13 || command -v g++)"; git submodule update --init --recursive -q && vendor/sdl3/build.sh --build-dir="$PWD/.sdl3-build" --prefix="$PWD/.sdl3-prefix" --vendored-font-deps --disable-libusb && ( ./bootstrap || autoreconf -fi ) && ./configure --prefix=$PREFIX --with-sdl3=vendored --with-sdl3-prefix="$PWD/.sdl3-prefix" --disable-x11-client --disable-xp-mapedit --disable-replay --disable-server-tray && XV="$(git describe --tags --always)" && XC="$(git rev-parse HEAD)" && make -j$(nproc) XPILOT_VERSION="$XV" XPILOT_COMMIT_ID="$XC" && make install XPILOT_VERSION="$XV" XPILOT_COMMIT_ID="$XC"'
-                  uninstall-cmd: "make uninstall" }
+                  build: 'export CC="$(command -v gcc-14 || command -v gcc-13 || command -v gcc)"; export CXX="$(command -v g++-14 || command -v g++-13 || command -v g++)"; git submodule update --init --recursive -q && vendor/sdl3/build.sh --build-dir="$PWD/.sdl3-build" --prefix="$PWD/.sdl3-prefix" --vendored-font-deps --disable-libusb && ( ./bootstrap || autoreconf -fi ) && ./configure --prefix=$PREFIX --with-sdl3=vendored --with-sdl3-prefix="$PWD/.sdl3-prefix" --disable-x11-client --disable-xp-mapedit --disable-replay --disable-server-tray && XV="$(git describe --tags --always)" && XC="$(git rev-parse HEAD)" && make -j$(nproc) XPILOT_VERSION="$XV" XPILOT_COMMIT_ID="$XC" && $SUDO make install XPILOT_VERSION="$XV" XPILOT_COMMIT_ID="$XC"'
+                  uninstall-cmd: "$SUDO make uninstall" }
             ]
         }
         // EASTL (Electronic Arts) — an STL-alternative C++ template library. Only Arch (AUR) packages
@@ -463,7 +463,7 @@
                 { via: source  repo: "https://github.com/electronicarts/EASTL"
                   version: { github: electronicarts/EASTL }
                   requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DEASTL_BUILD_TESTS=OFF -DEASTL_BUILD_BENCHMARK=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DEASTL_BUILD_TESTS=OFF -DEASTL_BUILD_BENCHMARK=OFF && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         // --- folly's C++-library dependencies (also useful standalone) ---------------------------
@@ -476,14 +476,14 @@
             install: [
                 { via: source  repo: "https://github.com/fmtlib/fmt"
                   version: { github: fmtlib/fmt }  requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DFMT_TEST=OFF -DFMT_DOC=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DFMT_TEST=OFF -DFMT_DOC=OFF && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         gflags: { attrs: [ lib FOSS permissive ]
             install: [
                 { via: source  repo: "https://github.com/gflags/gflags"
                   version: { github: gflags/gflags  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_TESTING=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_TESTING=OFF && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         // glog: auto-detects gflags if present (folly pulls both). Tests off.
@@ -491,14 +491,14 @@
             install: [
                 { via: source  repo: "https://github.com/google/glog"
                   version: { github: google/glog  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DWITH_GTEST=OFF -DBUILD_TESTING=OFF && cmake --build build -j$(nproc) && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DWITH_GTEST=OFF -DBUILD_TESTING=OFF && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         double-conversion: { attrs: [ lib FOSS permissive ]
             install: [
                 { via: source  repo: "https://github.com/google/double-conversion"
                   version: { github: google/double-conversion  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON && cmake --build build -j$(nproc) && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON && cmake --build build -j$(nproc) && $SUDO cmake --install build" }
             ]
         }
         // fast_float: header-only (folly REQUIREs it; it's spottily packaged, so source is the safe
@@ -508,7 +508,7 @@
             install: [
                 { via: source  repo: "https://github.com/fastfloat/fast_float"
                   version: { github: fastfloat/fast_float  strip-v: true }  tag-prefix: "v"  requires: [ cxx, cmake, make ]
-                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DFASTFLOAT_INSTALL=ON -DFASTFLOAT_TEST=OFF && cmake --install build" }
+                  build: "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DFASTFLOAT_INSTALL=ON -DFASTFLOAT_TEST=OFF && $SUDO cmake --install build" }
             ]
         }
 
@@ -542,8 +542,8 @@
                   requires: [ cxx, cmake, make, boost, openssl, libevent, zlib, fmt, fast_float, gflags,
                               glog, double-conversion, libzstd, liblz4, snappy, bzip2 ]
                   suggests: [ libsodium, libaio, libunwind, libdwarf, libiberty ]   // optional folly features; soft — skipped where a distro lacks them
-                  build: [ "grep -qs IORING_OP_RECV_ZC $PREFIX/include/liburing/io_uring.h || { t=$(git ls-remote --tags --refs --sort=-v:refname https://github.com/axboe/liburing 'refs/tags/liburing-[0-9]*' | sed 's#.*/##' | grep -vE -- '-(rc|beta)' | head -1) && d=$(mktemp -d) && git clone --depth 1 --branch $t https://github.com/axboe/liburing $d && ( cd $d && ./configure --prefix=$PREFIX && make -j$(nproc) && make install ) && rm -rf $d; }"   // build the latest STABLE liburing into $PREFIX for folly's io_uring backend (idempotent)
-                           "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=$PREFIX/lib -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON && cmake --build build -j$(nproc) && cmake --install build" ] }
+                  build: [ "grep -qs IORING_OP_RECV_ZC $PREFIX/include/liburing/io_uring.h || { t=$(git ls-remote --tags --refs --sort=-v:refname https://github.com/axboe/liburing 'refs/tags/liburing-[0-9]*' | sed 's#.*/##' | grep -vE -- '-(rc|beta)' | head -1) && d=$(mktemp -d) && git clone --depth 1 --branch $t https://github.com/axboe/liburing $d && ( cd $d && ./configure --prefix=$PREFIX && make -j$(nproc) && $SUDO make install ) && rm -rf $d; }"   // build the latest STABLE liburing into $PREFIX for folly's io_uring backend (idempotent)
+                           "cmake -B build -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_SHARED_LIBS=ON -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_RPATH=$PREFIX/lib -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON && cmake --build build -j$(nproc) && $SUDO cmake --install build" ] }
             ]
         }
     }

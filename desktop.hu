@@ -12,13 +12,13 @@
         // --- suckless X11 (edit config.h, then `make install`) ---
         dwm: { attrs: [ GUI FOSS permissive ] description: "dwm — the suckless dynamic tiling window manager for Xorg (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/dwm"  requires: [ libx11, libxinerama, libxft ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         st: { attrs: [ GUI FOSS permissive ] description: "st — the suckless simple terminal for Xorg (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/st"  requires: [ libx11, libxft ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         dmenu: { attrs: [ GUI FOSS permissive ] description: "dmenu — the suckless dynamic menu / app launcher for X (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/dmenu"  requires: [ libx11, libxinerama, libxft ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
 
         // --- more suckless X11 tools (config.h-compiled where noted; all from git.suckless.org) ---
         // slock — an X screen locker. Its `make install` sets the binary setuid root; a user-scope
@@ -26,67 +26,67 @@
         // (or `sudo chown root && chmod u+s` the built binary). Included as a build; wire that up yourself.
         slock: { attrs: [ GUI FOSS permissive ] description: "slock — the suckless simple X screen locker (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/slock"  requires: [ libx11, libxext, libxrandr ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         tabbed: { attrs: [ GUI FOSS permissive ] description: "tabbed — a generic tabbed container that embeds X apps (st, surf, …) via XEmbed (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/tabbed"  requires: [ libx11, libxft ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         slstatus: { attrs: [ CLI FOSS permissive ] description: "slstatus — a lightweight status monitor that feeds the dwm/dwl bar (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/slstatus"  requires: [ libx11 ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         sent: { attrs: [ GUI FOSS permissive ] description: "sent — a simple plaintext presentation tool (config.h-compiled)." suggests: farbfeld
             install: [ { via: source  repo: "https://git.suckless.org/sent"  requires: [ libx11, libxft ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }   // suggests farbfeld — sent shells out to it to display images
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }   // suggests farbfeld — sent shells out to it to display images
         svkbd: { attrs: [ GUI FOSS permissive ] description: "svkbd — the suckless on-screen virtual keyboard (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/svkbd"  requires: [ libx11, libxft, libxtst ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         lsw: { attrs: [ CLI FOSS permissive ] description: "lsw — list the X windows owned by a client (suckless)."
             install: [ { via: source  repo: "https://git.suckless.org/lsw"  requires: [ libx11 ]
-                         build: "make PREFIX=$PREFIX install" } ] }
+                         build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         xssstate: { attrs: [ CLI FOSS permissive ] description: "xssstate — query the X screensaver idle time / state (suckless)."
             install: [ { via: source  repo: "https://git.suckless.org/xssstate"  requires: [ libx11, libxss ]
-                         build: "make PREFIX=$PREFIX install" } ] }
+                         build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         // surf — a minimalist WebKitGTK browser (config.h-compiled). WebKit's pkg-config module drifts
         // (webkit2gtk-4.0 vs 4.1); the core `webkit2gtk` component targets 4.1 — patch surf's config.mk
         // if your distro only has 4.0. [UNVERIFIED build.]
         surf: { attrs: [ GUI FOSS permissive ] description: "surf — a minimalist WebKitGTK web browser driven by dmenu/keys (config.h-compiled)."
             install: [ { via: source  repo: "https://git.suckless.org/surf"  requires: [ webkit2gtk, gtk3, libx11 ]
-                         build: "make PREFIX=$PREFIX clean install" } ] }
+                         build: "make PREFIX=$PREFIX clean && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
 
         // --- suckless CLI / server utilities (no X; portable C) ---
         farbfeld: { attrs: [ CLI FOSS permissive ] description: "farbfeld — the suckless lossless image format + png/jpg converters (`png2ff`, `ff2png`, …)."
             install: [ { via: source  repo: "https://git.suckless.org/farbfeld"  requires: [ libpng, libjpeg ]
-                         build: "make PREFIX=$PREFIX install" } ] }
+                         build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         scron: { attrs: [ CLI daemon FOSS permissive ] description: "scron — a simple, spec-compliant cron daemon (`crond`/`crontab`)."
-            install: [ { via: source  repo: "https://git.suckless.org/scron"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/scron"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         ii: { attrs: [ CLI FOSS permissive ] description: "ii — a minimalist FIFO/filesystem-based IRC client (script it with the shell)."
-            install: [ { via: source  repo: "https://git.suckless.org/ii"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/ii"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         sic: { attrs: [ CLI FOSS permissive ] description: "sic — a tiny standalone IRC client (stdin/stdout)."
-            install: [ { via: source  repo: "https://git.suckless.org/sic"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/sic"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         smu: { attrs: [ CLI FOSS permissive ] description: "smu — a small Markdown-to-HTML processor."
-            install: [ { via: source  repo: "https://git.suckless.org/smu"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/smu"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         quark: { attrs: [ CLI daemon web FOSS permissive ] description: "quark — a tiny, fast static-content HTTP server."
-            install: [ { via: source  repo: "https://git.suckless.org/quark"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/quark"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         blind: { attrs: [ CLI FOSS permissive ] description: "blind — a suite of small utilities for editing raw (headerless) video streams."
-            install: [ { via: source  repo: "https://git.suckless.org/blind"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/blind"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
 
         // sbase / ubase — suckless coreutils/util-linux clones. Bundled in the `suckless-coreutils`
         // profile (and NOT any broad one): they install ~dozens of binaries (ls, cp, mount, …) into
         // $PREFIX/bin (~/.local/bin), usually EARLIER in PATH than /usr/bin — so they SHADOW the system
         // tools. Activate that profile (or install by name) deliberately, only if that's what you want.
         sbase: { attrs: [ CLI FOSS permissive ] description: "sbase — suckless portable POSIX coreutils clones (ls/cat/cp/… — SHADOWS system coreutils in ~/.local/bin)."
-            install: [ { via: source  repo: "https://git.suckless.org/sbase"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/sbase"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         ubase: { attrs: [ CLI FOSS permissive ] description: "ubase — suckless Linux base utilities (mount/mkfs/… — Linux-only; SHADOWS util-linux in ~/.local/bin)."
-            install: [ { via: source  repo: "https://git.suckless.org/ubase"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/ubase"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         // 9base — a port of the Plan 9 userland tools. Installs under $PREFIX/plan9 (off PATH), so it
         // shadows nothing; it rides in the `suckless-tools` profile. [UNVERIFIED build path.]
         9base: { attrs: [ CLI FOSS permissive ] description: "9base — a port of the Plan 9 userland utilities (rc, awk, sed, …)."
-            install: [ { via: source  repo: "https://git.suckless.org/9base"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/9base"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
 
         // --- suckless libraries (build targets for developers; component-only, not in the profile) ---
         libgrapheme: { attrs: [ lib FOSS permissive ] description: "libgrapheme — a freestanding C library for Unicode grapheme/word/line segmentation."
-            install: [ { via: source  repo: "https://git.suckless.org/libgrapheme"  build: "./configure && make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/libgrapheme"  build: "./configure && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         libzahl: { attrs: [ lib FOSS permissive ] description: "libzahl — a suckless arbitrary-precision (bignum) integer library."
-            install: [ { via: source  repo: "https://git.suckless.org/libzahl"  build: "make PREFIX=$PREFIX install" } ] }
+            install: [ { via: source  repo: "https://git.suckless.org/libzahl"  build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
 
         // dwmblocks + dwmblocks-async both build the `dwmblocks` binary -> install ONE (alternatives).
         // dwmblocks (torrinfail, unmaintained) passes a `void(*)(void)` handler to signal(), which
@@ -94,12 +94,12 @@
         // keep it a warning (its Makefile uses neither CPPFLAGS nor a settable CFLAGS on that line).
         dwmblocks: { attrs: [ CLI FOSS permissive ] description: "dwmblocks — a modular status-bar feeder for dwm (blocks defined in config.h)."
             install: [ { via: source  repo: "https://github.com/torrinfail/dwmblocks"  requires: [ libx11 ]
-                         build: "make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX install" } ] }
+                         build: "make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX && $SUDO make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX install" } ] }
         // dwmblocks-async links `xcb-atom` via pkg-config but not base libxcb, so its raw xcb_* calls
         // are undefined at link — add `xcb` to LIBS (pkg-config then emits -lxcb). Uses xcb, not Xlib.
         dwmblocks-async: { attrs: [ CLI FOSS permissive ] description: "dwmblocks-async — an asynchronous rewrite of dwmblocks (concurrent status blocks)."
             install: [ { via: source  repo: "https://github.com/UtkarshVerma/dwmblocks-async"  requires: [ libxcb, xcb-util ]
-                         build: "make LIBS='xcb-atom xcb' PREFIX=$PREFIX install" } ] }
+                         build: "make LIBS='xcb-atom xcb' PREFIX=$PREFIX && $SUDO make LIBS='xcb-atom xcb' PREFIX=$PREFIX install" } ] }
 
         // --- dwl / Wayland (wlroots). dwl locks to ONE wlroots MINOR (its Makefile pkg-configs a
         // specific `wlroots-0.XX`); a rolling distro whose wlroots has moved on WILL fail the build.
@@ -109,21 +109,21 @@
         dwl: { attrs: [ GUI FOSS copyleft ] description: "dwl — a dwm-like Wayland compositor built on wlroots (config.h-compiled)."
             install: [ { via: source  repo: "https://codeberg.org/dwl/dwl"
                          requires: [ wlroots, wayland, wayland-protocols, libinput, libxkbcommon, pixman, pkg-config ]
-                         build: "cp config.def.h config.h && make PREFIX=$PREFIX install" } ] }
+                         build: "cp config.def.h config.h && make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
         // somebar's meson build needs config.hpp created from config.def.hpp first (no auto-copy).
         somebar: { attrs: [ GUI FOSS permissive ] description: "somebar — a dwm-like status/tag bar for dwl (config.hpp-compiled, meson build)."
             install: [ { via: source  repo: "https://git.sr.ht/~raphi/somebar"
                          requires: [ wayland, wayland-protocols, cairo, pango, meson, ninja, pkg-config ]
-                         build: "cp src/config.def.hpp src/config.hpp && meson setup --prefix=$PREFIX build && ninja -C build install" } ] }
+                         build: "cp src/config.def.hpp src/config.hpp && meson setup --prefix=$PREFIX build && ninja -C build && $SUDO ninja -C build install" } ] }
         // someblocks has the same GCC-14 signal()-handler error as dwmblocks (its Makefile uses only
         // LDFLAGS on the compile line, so inject the downgrade via CC).
         someblocks: { attrs: [ CLI FOSS permissive ] description: "someblocks — a dwmblocks-style status feeder for somebar (config.h-compiled)."
             install: [ { via: source  repo: "https://git.sr.ht/~raphi/someblocks"
-                         build: "make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX install" } ] }
+                         build: "make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX && $SUDO make CC='cc -Wno-error=incompatible-pointer-types' PREFIX=$PREFIX install" } ] }
 
         // fff (defined in core: native on Debian + AUR on Arch) — ADD a source method so it builds on
         // Fedora/openSUSE/Alpine/EL too. Pure Bash: the Makefile installs the script into $PREFIX/bin.
         fff: { install: [ { via: source  repo: "https://github.com/dylanaraps/fff"
-                            build: "make PREFIX=$PREFIX install" } ] }
+                            build: "make PREFIX=$PREFIX && $SUDO make PREFIX=$PREFIX install" } ] }
     }
 }
