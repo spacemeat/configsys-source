@@ -7,8 +7,8 @@
     //   * your own primary-plugin / top-config amendments to the same profile still compose
     //     on top (all `+self` amends stack: repo -> here -> your primary).
     //
-    // A plugin may POPULATE a profile but not ACTIVATE it — `configs:` is a machine setting and
-    // stays your local choice. Name the profile exactly as the repo does (dev, web-dev, …) so the
+    // A plugin may POPULATE a profile but never install it — profiles are browse categories, and
+    // what a machine installs is its `picks:`, your own choice. Name the profile exactly as the repo does (dev, web-dev, …) so the
     // `+self` term hooks the right base; a name with no lower definition just becomes a fresh
     // profile this plugin owns.
     profiles: {
